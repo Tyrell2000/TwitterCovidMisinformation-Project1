@@ -24,7 +24,7 @@ csv = open('TwitterData.csv', 'w', encoding="utf-8")
 # Here is the documentation for this: https://docs.tweepy.org/en/stable/api.html#timeline-methods
 # Max number of tweets we can return is 200, unless we do a special method
 # in which case, it is 3200.
-public_tweets = tweepy.Cursor(api.search, q='#HASHTAG -filter:retweets').items(100)
+public_tweets = tweepy.Cursor(api.search, q='#Coronavirus OR #COVID -filter:retweets', tweet_mode='extended', lang='en').items(100)
 
 # Here is a list of all the data we are collecting/how the data is being stored in the CSV
 csv.write('tweet_created_at, id_str, tweet_text, hashtags, source, user_id_str, user_name, user_screen_name, location, profile_location, user_profile_description, url, protected, followers_count, friends_count, listed_count, profile_created_at, favorites_count, utc_offset, geo_enabled, verified, statuses_count, lang, status, contributors_enabled, is_translation_enabled, tweet_geo, tweet_coordinates, tweet_place, tweet_contributors, tweet_is_quote_status, tweet_retweet_count, tweet_favorite_count')
@@ -36,6 +36,8 @@ retweets = 0
 # (the tweet) and am writing it to the CSV. https://www.geeksforgeeks.org/python-status-object-in-tweepy/
 for tweet in public_tweets:
     if not tweet.retweeted:
+        print(tweet.full_text.replace("\n", " ").replace('"', "'"))
+        print(tweet.entities)
         csv.write('"' + str(tweet.created_at).replace("\n", " ").replace('"', "'") + '",')
         ##csv.write('"' + str(tweet.id).replace("\n", " ").replace('"', "'") + '",')
         csv.write('"' + str(tweet.id_str).replace("\n", " ").replace('"', "'") + '",')
@@ -44,7 +46,7 @@ for tweet in public_tweets:
         # Need to convert " into ' in the text, as in order to keep commas in the text, we
         # have to put the sentence in "". Thus, if there are any sentences with a single "
         # (I ran into one during this), it will mess up the formatting
-        csv.write('"' + tweet.text.replace("\n", " ").replace('"', "'") + '",')
+        csv.write('"' + tweet.full_text.replace("\n", " ").replace('"', "'") + '",')
 
         # Entities is an object with variation in the number of elements
         # after doing a few hours of work on this, it has been decided
@@ -56,7 +58,7 @@ for tweet in public_tweets:
         if len(tweet.entities['hashtags']) > 0:
             csv.write('"' + str(tweet.entities['hashtags'][0]['text']).replace("\n", " ").replace('"', "'") + '",')
         else:
-            csv.write('"' + "NONE" + '",')
+            csv.write('"' + "N/A" + '",')
         ##csv.write('"' + str(tweet.entities['hashtag'][0]).replace("\n", " ").replace('"', "'") + '",')
 
         csv.write('"' + str(tweet.source).replace("\n", " ").replace('"', "'") + '",')
