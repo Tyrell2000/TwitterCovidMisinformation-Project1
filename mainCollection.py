@@ -24,7 +24,7 @@ csv = open('TwitterData.csv', 'w', encoding="utf-8")
 # Here is the documentation for this: https://docs.tweepy.org/en/stable/api.html#timeline-methods
 # Max number of tweets we can return is 200, unless we do a special method
 # in which case, it is 3200.
-public_tweets = api.user_timeline(screen_name='@Anime_Rankings', count=200)
+public_tweets = api.user_timeline(screen_name='@fema', count=200)
 
 # Here is a list of all the data we are collecting/how the data is being stored in the CSV
 csv.write('tweet_created_at, id_str, tweet_text, hashtags, source, user_id_str, user_name, user_screen_name, location, profile_location, user_profile_description, url, protected, followers_count, friends_count, listed_count, profile_created_at, favorites_count, utc_offset, geo_enabled, verified, statuses_count, lang, status, contributors_enabled, is_translation_enabled, tweet_geo, tweet_coordinates, tweet_place, tweet_contributors, tweet_is_quote_status, tweet_retweet_count, tweet_favorite_count')
