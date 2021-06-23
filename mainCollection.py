@@ -74,7 +74,6 @@ for tweet in public_tweets:
         # This gives us data about the user. Source: https://www.geeksforgeeks.org/python-user-object-in-tweepy/
         # The original code for writing this to a file is below:
         # csv.write(str(tweet.user) + ",")
-        
 
         ##if hasattr(tweet.user, 'id'):
             ##csv.write('"' + str(tweet.user.id).replace("\n", " ").replace('"', "'") + '",')
