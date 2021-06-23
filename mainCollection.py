@@ -4,10 +4,10 @@ import tweepy
 
 # The consumer_key, consumer_secret, access_token, and access_token_secret are here for testing purposes, we need to replace them later.
 #  consumer_key and consumer_secret go here
-auth = tweepy.OAuthHandler('', '')
+auth = tweepy.OAuthHandler('4HHuvkoNWfvXsJ2yG1T7nIbtM', '0YM963puOMmDOwId3UuxtC6nRdZw1A3H6IZq9EorgRXO4TfTlG')
 
 # access_token and access_token_secret go here
-auth.set_access_token('', '')
+auth.set_access_token('2856969806-KuiNT2Gu8xT3vdJDhiM79ut7MPh8ximDbZYBmBy', 'Lm5P9zI48q2HCaV4viqU1U0Ue11rlgrcAv33RieYuChMw')
 
 # Authorizes the tweepy api
 api = tweepy.API(auth)
@@ -16,7 +16,7 @@ api = tweepy.API(auth)
 # as it cant process tweets with emojis, ', and other stuff in it.
 # The first slot in this is to make a file, the next slot is
 # either 'w' (write), 'a' (append), or 'x' (create). https://www.w3schools.com/python/python_file_write.as
-csv = open('TwitterData.csv', 'a', encoding="utf-8")
+csv = open('TwitterData.csv', 'w', encoding="utf-8")
 
 # To my knowledge, we do user_timeline to get specific users. User_timeline
 # does BOTH tweets and retweets on the specific twitter handle.
@@ -24,281 +24,294 @@ csv = open('TwitterData.csv', 'a', encoding="utf-8")
 # Here is the documentation for this: https://docs.tweepy.org/en/stable/api.html#timeline-methods
 # Max number of tweets we can return is 200, unless we do a special method
 # in which case, it is 3200.
-public_tweets = api.user_timeline(screen_name='@fema', count=200)
+public_tweets = api.user_timeline(screen_name='@Anime_Rankings', count=200)
 
 # Here is a list of all the data we are collecting/how the data is being stored in the CSV
-csv.write('created_at,id,id_str,text,entities,source,source_url,in_reply_to_status_id,in_reply_to_status_id_str,in_reply_to_user_id,in_reply_to_user_id,in_reply_to_screen_name,user_id ,user_id_str ,user_name ,user_screen_name ,user_location ,user_profile_location ,user_description ,user_url ,user_entities ,user_protected ,user_followers_count ,user_friends_count ,user_listed_count ,user_created_at ,user_favourites_count ,user_utc_offset ,user_geo_enabled ,user_verified ,user_statuses_count ,user_lang ,user_status ,user_contributors_enabled ,user_is_translator ,user_is_translation_enabled ,user_profile_background_color ,user_profile_background_image_url ,user_profile_background_image_url_https ,user_profile_background_tile ,user_profile_image_url ,user_profile_image_url_https ,user_profile_banner_url ,user_profile_link_color ,user_profile_sidebar_border_color ,user_profile_sidebar_fill_color ,user_profile_text_color ,user_profile_use_background_image ,user_has_extended_profile ,user_default_profile ,user_default_profile_image ,user_following ,user_follow_request_sent, user_notifications,geo,coordinates,place,contributors,is_quote_status,retweet_count,favorite_count,favorited,retweeted,possibly_sensitive,lang')
+csv.write('tweet_created_at, id_str, tweet_text, hashtags, source, user_id_str, user_name, user_screen_name, location, profile_location, user_profile_description, url, protected, followers_count, friends_count, listed_count, profile_created_at, favorites_count, utc_offset, geo_enabled, verified, statuses_count, lang, status, contributors_enabled, is_translation_enabled, tweet_geo, tweet_coordinates, tweet_place, tweet_contributors, tweet_is_quote_status, tweet_retweet_count, tweet_favorite_count')
 csv.write('\n \n')
 
+retweets = 0
 
 # To summarize this section, I more or less just got every item in Status object
 # (the tweet) and am writing it to the CSV. https://www.geeksforgeeks.org/python-status-object-in-tweepy/
 for tweet in public_tweets:
-    csv.write('"' + str(tweet.created_at).replace("\n", " ").replace('"', "'") + '",')
-    csv.write('"' + str(tweet.id).replace("\n", " ").replace('"', "'") + '",')
-    csv.write('"' + str(tweet.id_str).replace("\n", " ").replace('"', "'") + '",')
-    # Need to replace \n (newlines) in text as it will cause a new line in the CSV file
-    # Need to convert " into ' in the text, as in order to keep commas in the text, we
-    # have to put the sentence in "". Thus, if there are any sentences with a single "
-    # (I ran into one during this), it will mess up the formatting
-    csv.write('"' + tweet.text.replace("\n", " ").replace('"', "'") + '",')
+    if not tweet.retweeted:
+        csv.write('"' + str(tweet.created_at).replace("\n", " ").replace('"', "'") + '",')
+        ##csv.write('"' + str(tweet.id).replace("\n", " ").replace('"', "'") + '",')
+        csv.write('"' + str(tweet.id_str).replace("\n", " ").replace('"', "'") + '",')
 
-    # Entities is an object with variation in the number of elements
-    # after doing a few hours of work on this, it has been decided
-    # that the best way to go about having this in the data is
-    # to keep the data unedited (its gonna be a dict with an array in it, ect)
-    csv.write('"' + str(tweet.entities).replace("\n", " ").replace('"', "'") + '",')
+        # Need to replace \n (newlines) in text as it will cause a new line in the CSV file
+        # Need to convert " into ' in the text, as in order to keep commas in the text, we
+        # have to put the sentence in "". Thus, if there are any sentences with a single "
+        # (I ran into one during this), it will mess up the formatting
+        csv.write('"' + tweet.text.replace("\n", " ").replace('"', "'") + '",')
 
-    csv.write('"' + str(tweet.source).replace("\n", " ").replace('"', "'") + '",')
-    csv.write('"' + str(tweet.source_url).replace("\n", " ").replace('"', "'") + '",')
-    csv.write('"' + str(tweet.in_reply_to_status_id).replace("\n", " ").replace('"', "'") + '",')
-    csv.write('"' + str(tweet.in_reply_to_status_id_str).replace("\n", " ").replace('"', "'") + '",')
-    csv.write('"' + str(tweet.in_reply_to_user_id).replace("\n", " ").replace('"', "'") + '",')
-    csv.write('"' + str(tweet.in_reply_to_user_id_str).replace("\n", " ").replace('"', "'") + '",')
-    csv.write('"' + str(tweet.in_reply_to_screen_name).replace("\n", " ").replace('"', "'") + '",')
+        # Entities is an object with variation in the number of elements
+        # after doing a few hours of work on this, it has been decided
+        # that the best way to go about having this in the data is
+        # to keep the data unedited (its gonna be a dict with an array in it, ect)
+        ##csv.write('"' + str(tweet.entities).replace("\n", " ").replace('"', "'") + '",')
+        ##print('"' + str(tweet.entities).replace("\n", " ").replace('"', "'") + '",')
 
-    # User is the other object with variation. However, this one we can
-    # just check if certain attributes are here, and mark none if they aren't
-    # present. This also has entities, so we will just have to leave that unedited.
-    # anyways, you can skip the next like 200 lines or so, cause its all tweet.user.
-    # This gives us data about the user. Source: https://www.geeksforgeeks.org/python-user-object-in-tweepy/
-    # The original code for writing this to a file is below:
-    # csv.write(str(tweet.user) + ",")
+        if len(tweet.entities['hashtags']) > 0:
+            csv.write('"' + str(tweet.entities['hashtags'][0]['text']).replace("\n", " ").replace('"', "'") + '",')
+        else:
+            csv.write('"' + "NONE" + '",')
+        ##csv.write('"' + str(tweet.entities['hashtag'][0]).replace("\n", " ").replace('"', "'") + '",')
 
-    if hasattr(tweet.user, 'id'):
-        csv.write('"' + str(tweet.user.id).replace("\n", " ").replace('"', "'") + '",')
+        csv.write('"' + str(tweet.source).replace("\n", " ").replace('"', "'") + '",')
+        ##csv.write('"' + str(tweet.source_url).replace("\n", " ").replace('"', "'") + '",')
+        ##csv.write('"' + str(tweet.in_reply_to_status_id).replace("\n", " ").replace('"', "'") + '",')
+        ##csv.write('"' + str(tweet.in_reply_to_status_id_str).replace("\n", " ").replace('"', "'") + '",')
+        ##csv.write('"' + str(tweet.in_reply_to_user_id).replace("\n", " ").replace('"', "'") + '",')
+        ##csv.write('"' + str(tweet.in_reply_to_user_id_str).replace("\n", " ").replace('"', "'") + '",')
+        ##csv.write('"' + str(tweet.in_reply_to_screen_name).replace("\n", " ").replace('"', "'") + '",')
+
+        # User is the other object with variation. However, this one we can
+        # just check if certain attributes are here, and mark none if they aren't
+        # present. This also has entities, so we will just have to leave that unedited.
+        # anyways, you can skip the next like 200 lines or so, cause its all tweet.user.
+        # This gives us data about the user. Source: https://www.geeksforgeeks.org/python-user-object-in-tweepy/
+        # The original code for writing this to a file is below:
+        # csv.write(str(tweet.user) + ",")
+
+        ##if hasattr(tweet.user, 'id'):
+            ##csv.write('"' + str(tweet.user.id).replace("\n", " ").replace('"', "'") + '",')
+        ##else:
+            ##csv.write('"' + "NONE" + '",')
+
+        if hasattr(tweet.user, 'id_str'):
+            csv.write('"' + str(tweet.user.id_str).replace("\n", " ").replace('"', "'") + '",')
+        else:
+            csv.write('"' + "NONE" + '",')
+
+        if hasattr(tweet.user, 'name'):
+            csv.write('"' + str(tweet.user.name).replace("\n", " ").replace('"', "'") + '",')
+        else:
+            csv.write('"' + "NONE" + '",')
+
+        if hasattr(tweet.user, 'screen_name'):
+            csv.write('"' + str(tweet.user.screen_name).replace("\n", " ").replace('"', "'") + '",')
+        else:
+            csv.write('"' + "NONE" + '",')
+
+        if hasattr(tweet.user, 'location'):
+            csv.write('"' + str(tweet.user.location).replace("\n", " ").replace('"', "'") + '",')
+        else:
+            csv.write('"' + "NONE" + '",')
+
+        if hasattr(tweet.user, 'profile_location'):
+            csv.write('"' + str(tweet.user.profile_location).replace("\n", " ").replace('"', "'") + '",')
+        else:
+            csv.write('"' + "NONE" + '",')
+
+        if hasattr(tweet.user, 'description'):
+            csv.write('"' + str(tweet.user.description).replace("\n", " ").replace('"', "'") + '",')
+        else:
+            csv.write('"' + "NONE" + '",')
+
+        if hasattr(tweet.user, 'url'):
+            csv.write('"' + str(tweet.user.url).replace("\n", " ").replace('"', "'") + '",')
+        else:
+            csv.write('"' + "NONE" + '",')
+
+        # Tested to see if there was any way I could process the data consistently
+        # with this. I could not find a way after a few hours, thus, this is
+        # unedited data.
+        ##if hasattr(tweet.user, 'entities'):
+            ##csv.write('"' + str(tweet.user.entities).replace("\n", " ").replace('"', "'") + '",')
+        ##else:
+            ##csv.write('"' + "NONE" + '",')
+
+        if hasattr(tweet.user, 'protected'):
+            csv.write('"' + str(tweet.user.protected).replace("\n", " ").replace('"', "'") + '",')
+        else:
+            csv.write('"' + "NONE" + '",')
+
+        if hasattr(tweet.user, 'followers_count'):
+            csv.write('"' + str(tweet.user.followers_count).replace("\n", " ").replace('"', "'") + '",')
+        else:
+            csv.write('"' + "NONE" + '",')
+
+        if hasattr(tweet.user, 'friends_count'):
+            csv.write('"' + str(tweet.user.friends_count).replace("\n", " ").replace('"', "'") + '",')
+        else:
+            csv.write('"' + "NONE" + '",')
+
+        if hasattr(tweet.user, 'listed_count'):
+            csv.write('"' + str(tweet.user.listed_count).replace("\n", " ").replace('"', "'") + '",')
+        else:
+            csv.write('"' + "NONE" + '",')
+
+        if hasattr(tweet.user, 'created_at'):
+            csv.write('"' + str(tweet.user.created_at).replace("\n", " ").replace('"', "'") + '",')
+        else:
+            csv.write('"' + "NONE" + '",')
+
+        if hasattr(tweet.user, 'favourites_count'):
+            csv.write('"' + str(tweet.user.favourites_count).replace("\n", " ").replace('"', "'") + '",')
+        else:
+            csv.write('"' + "NONE" + '",')
+
+        if hasattr(tweet.user, 'utc_offset'):
+            csv.write('"' + str(tweet.user.utc_offset).replace("\n", " ").replace('"', "'") + '",')
+        else:
+            csv.write('"' + "NONE" + '",')
+
+        if hasattr(tweet.user, 'geo_enabled'):
+            csv.write('"' + str(tweet.user.geo_enabled).replace("\n", " ").replace('"', "'") + '",')
+        else:
+            csv.write('"' + "NONE" + '",')
+
+        if hasattr(tweet.user, 'verified'):
+            csv.write('"' + str(tweet.user.verified).replace("\n", " ").replace('"', "'") + '",')
+        else:
+            csv.write('"' + "NONE" + '",')
+
+        if hasattr(tweet.user, 'statuses_count'):
+            csv.write('"' + str(tweet.user.statuses_count).replace("\n", " ").replace('"', "'") + '",')
+        else:
+            csv.write('"' + "NONE" + '",')
+
+        if hasattr(tweet.user, 'lang'):
+            csv.write('"' + str(tweet.user.lang).replace("\n", " ").replace('"', "'") + '",')
+        else:
+            csv.write('"' + "NONE" + '",')
+
+        if hasattr(tweet.user, 'status'):
+            # Not sure if there needs to be more division, as I havent seen
+            csv.write('"' + str(tweet.user.status).replace("\n", " ").replace('"', "'") + '",')
+        else:
+            csv.write('"' + "NONE" + '",')
+
+        if hasattr(tweet.user, 'contributors_enabled'):
+            csv.write('"' + str(tweet.user.contributors_enabled).replace("\n", " ").replace('"', "'") + '",')
+        else:
+            csv.write('"' + "NONE" + '",')
+
+        ##if hasattr(tweet.user, 'is_translator'):
+            ##csv.write('"' + str(tweet.user.is_translator).replace("\n", " ").replace('"', "'") + '",')
+        ##else:
+            ##csv.write('"' + "NONE" + '",')
+
+        if hasattr(tweet.user, 'is_translation_enabled'):
+            csv.write('"' + str(tweet.user.is_translation_enabled).replace("\n", " ").replace('"', "'") + '",')
+        else:
+            csv.write('"' + "NONE" + '",')
+
+        ##if hasattr(tweet.user, 'profile_background_color'):
+            ##csv.write('"' + str(tweet.user.profile_background_color).replace("\n", " ").replace('"', "'") + '",')
+        ##else:
+            ##csv.write('"' + "NONE" + '",')
+
+        ##if hasattr(tweet.user, 'profile_background_image_url'):
+            ##csv.write('"' + str(tweet.user.profile_background_image_url).replace("\n", " ").replace('"', "'") + '",')
+        ##else:
+            ##csv.write('"' + "NONE" + '",')
+
+        ##if hasattr(tweet.user, 'profile_background_image_url_https'):
+            ##csv.write('"' + str(tweet.user.profile_background_image_url_https).replace("\n", " ").replace('"', "'") + '",')
+        ##else:
+            ##csv.write('"' + "NONE" + '",')
+
+        ##if hasattr(tweet.user, 'profile_background_tile'):
+            ##csv.write('"' + str(tweet.user.profile_background_tile).replace("\n", " ").replace('"', "'") + '",')
+        ##else:
+            ##csv.write('"' + "NONE" + '",')
+
+        ##if hasattr(tweet.user, 'profile_image_url'):
+            ##csv.write('"' + str(tweet.user.profile_image_url).replace("\n", " ").replace('"', "'") + '",')
+        ##else:
+            ##csv.write('"' + "NONE" + '",')
+
+        ##if hasattr(tweet.user, 'profile_image_url_https'):
+            ##csv.write('"' + str(tweet.user.profile_image_url_https).replace("\n", " ").replace('"', "'") + '",')
+        ##else:
+            ##csv.write('"' + "NONE" + '",')
+
+        ##if hasattr(tweet.user, 'profile_banner_url'):
+            ##csv.write('"' + str(tweet.user.profile_banner_url).replace("\n", " ").replace('"', "'") + '",')
+        ##else:
+            ##csv.write('"' + "NONE" + '",')
+
+        ##if hasattr(tweet.user, 'profile_link_color'):
+            ##csv.write('"' + str(tweet.user.profile_link_color).replace("\n", " ").replace('"', "'") + '",')
+        ##else:
+            ##csv.write('"' + "NONE" + '",')
+
+        ##if hasattr(tweet.user, 'profile_sidebar_border_color'):
+            ##csv.write('"' + str(tweet.user.profile_sidebar_border_color).replace("\n", " ").replace('"', "'") + '",')
+        ##else:
+            ##csv.write('"' + "NONE" + '",')
+
+        ##if hasattr(tweet.user, 'profile_sidebar_fill_color'):
+            ##csv.write('"' + str(tweet.user.profile_sidebar_fill_color).replace("\n", " ").replace('"', "'") + '",')
+        ##else:
+            ##csv.write('"' + "NONE" + '",')
+
+        ##if hasattr(tweet.user, 'profile_text_color'):
+            ##csv.write('"' + str(tweet.user.profile_text_color).replace("\n", " ").replace('"', "'") + '",')
+        ##else:
+            ##csv.write('"' + "NONE" + '",')
+
+        ##if hasattr(tweet.user, 'profile_use_background_image'):
+            ##csv.write('"' + str(tweet.user.profile_use_background_image).replace("\n", " ").replace('"', "'") + '",')
+        ##else:
+            ##csv.write('"' + "NONE" + '",')
+
+        ##if hasattr(tweet.user, 'has_extended_profile'):
+            ##csv.write('"' + str(tweet.user.has_extended_profile).replace("\n", " ").replace('"', "'") + '",')
+        ##else:
+            ##csv.write('"' + "NONE" + '",')
+
+        ##if hasattr(tweet.user, 'default_profile'):
+            ##csv.write('"' + str(tweet.user.default_profile).replace("\n", " ").replace('"', "'") + '",')
+        ##else:
+            ##csv.write('"' + "NONE" + '",')
+
+        ##if hasattr(tweet.user, 'default_profile_image'):
+            ##csv.write('"' + str(tweet.user.default_profile_image).replace("\n", " ").replace('"', "'") + '",')
+        ##else:
+            ##csv.write('"' + "NONE" + '",')
+
+        ##if hasattr(tweet.user, 'following'):
+            ##csv.write('"' + str(tweet.user.following).replace("\n", " ").replace('"', "'") + '",')
+        ##else:
+            ##csv.write('"' + "NONE" + '",')
+
+        ##if hasattr(tweet.user, 'follow_request_sent'):
+            ##csv.write('"' + str(tweet.user.follow_request_sent).replace("\n", " ").replace('"', "'") + '",')
+        ##else:
+            ##csv.write('"' + "NONE" + '",')
+
+        ##if hasattr(tweet.user, 'notifications'):
+            ##csv.write('"' + str(tweet.user.notifications).replace("\n", " ").replace('"', "'") + '",')
+        ##else:
+            ##csv.write('"' + "NONE" + '",')
+
+       # This is the end of tweet.user data
+
+        csv.write('"' + str(tweet.geo).replace("\n", " ").replace('"', "'") + '",')
+        csv.write('"' + str(tweet.coordinates).replace("\n", " ").replace('"', "'") + '",')
+        csv.write('"' + str(tweet.place).replace("\n", " ").replace('"', "'") + '",')
+        csv.write('"' + str(tweet.contributors).replace("\n", " ").replace('"', "'") + '",')
+        csv.write('"' + str(tweet.is_quote_status).replace("\n", " ").replace('"', "'") + '",')
+        csv.write('"' + str(tweet.retweet_count).replace("\n", " ").replace('"', "'") + '",')
+        csv.write('"' + str(tweet.favorite_count).replace("\n", " ").replace('"', "'") + '",')
+        ##csv.write('"' + str(tweet.favorited).replace("\n", " ").replace('"', "'") + '",')
+        ##csv.write('"' + str(tweet.retweeted).replace("\n", " ").replace('"', "'") + '",')
+
+        # Possibly_Sensitive throws us an error, so we cannot use it currently.
+        ##if hasattr(tweet, 'possibly_sensitive'):
+            ##csv.write('"' + str(tweet.possibly_sensitive) + '",')
+        ##else:
+            ##csv.write('"NoData",')
+        ##csv.write('"' + str(tweet.lang).replace("\n", " ").replace('"', "'") + '"')
+
+        csv.write("\n")
+
     else:
-        csv.write('"' + "NONE" + '",')
-
-    if hasattr(tweet.user, 'id_str'):
-        csv.write('"' + str(tweet.user.id_str).replace("\n", " ").replace('"', "'") + '",')
-    else:
-        csv.write('"' + "NONE" + '",')
-
-    if hasattr(tweet.user, 'name'):
-        csv.write('"' + str(tweet.user.name).replace("\n", " ").replace('"', "'") + '",')
-    else:
-        csv.write('"' + "NONE" + '",')
-
-    if hasattr(tweet.user, 'screen_name'):
-        csv.write('"' + str(tweet.user.screen_name).replace("\n", " ").replace('"', "'") + '",')
-    else:
-        csv.write('"' + "NONE" + '",')
-
-    if hasattr(tweet.user, 'location'):
-        csv.write('"' + str(tweet.user.location).replace("\n", " ").replace('"', "'") + '",')
-    else:
-        csv.write('"' + "NONE" + '",')
-
-    if hasattr(tweet.user, 'profile_location'):
-        csv.write('"' + str(tweet.user.profile_location).replace("\n", " ").replace('"', "'") + '",')
-    else:
-        csv.write('"' + "NONE" + '",')
-
-    if hasattr(tweet.user, 'description'):
-        csv.write('"' + str(tweet.user.description).replace("\n", " ").replace('"', "'") + '",')
-    else:
-        csv.write('"' + "NONE" + '",')
-
-    if hasattr(tweet.user, 'url'):
-        csv.write('"' + str(tweet.user.url).replace("\n", " ").replace('"', "'") + '",')
-    else:
-        csv.write('"' + "NONE" + '",')
-
-    # Tested to see if there was any way I could process the data consistently
-    # with this. I could not find a way after a few hours, thus, this is
-    # unedited data.
-    if hasattr(tweet.user, 'entities'):
-        csv.write('"' + str(tweet.user.entities).replace("\n", " ").replace('"', "'") + '",')
-    else:
-        csv.write('"' + "NONE" + '",')
-
-    if hasattr(tweet.user, 'protected'):
-        csv.write('"' + str(tweet.user.protected).replace("\n", " ").replace('"', "'") + '",')
-    else:
-        csv.write('"' + "NONE" + '",')
-
-    if hasattr(tweet.user, 'followers_count'):
-        csv.write('"' + str(tweet.user.followers_count).replace("\n", " ").replace('"', "'") + '",')
-    else:
-        csv.write('"' + "NONE" + '",')
-
-    if hasattr(tweet.user, 'friends_count'):
-        csv.write('"' + str(tweet.user.friends_count).replace("\n", " ").replace('"', "'") + '",')
-    else:
-        csv.write('"' + "NONE" + '",')
-
-    if hasattr(tweet.user, 'listed_count'):
-        csv.write('"' + str(tweet.user.listed_count).replace("\n", " ").replace('"', "'") + '",')
-    else:
-        csv.write('"' + "NONE" + '",')
-
-    if hasattr(tweet.user, 'created_at'):
-        csv.write('"' + str(tweet.user.created_at).replace("\n", " ").replace('"', "'") + '",')
-    else:
-        csv.write('"' + "NONE" + '",')
-
-    if hasattr(tweet.user, 'favourites_count'):
-        csv.write('"' + str(tweet.user.favourites_count).replace("\n", " ").replace('"', "'") + '",')
-    else:
-        csv.write('"' + "NONE" + '",')
-
-    if hasattr(tweet.user, 'utc_offset'):
-        csv.write('"' + str(tweet.user.utc_offset).replace("\n", " ").replace('"', "'") + '",')
-    else:
-        csv.write('"' + "NONE" + '",')
-
-    if hasattr(tweet.user, 'geo_enabled'):
-        csv.write('"' + str(tweet.user.geo_enabled).replace("\n", " ").replace('"', "'") + '",')
-    else:
-        csv.write('"' + "NONE" + '",')
-
-    if hasattr(tweet.user, 'verified'):
-        csv.write('"' + str(tweet.user.verified).replace("\n", " ").replace('"', "'") + '",')
-    else:
-        csv.write('"' + "NONE" + '",')
-
-    if hasattr(tweet.user, 'statuses_count'):
-        csv.write('"' + str(tweet.user.statuses_count).replace("\n", " ").replace('"', "'") + '",')
-    else:
-        csv.write('"' + "NONE" + '",')
-
-    if hasattr(tweet.user, 'lang'):
-        csv.write('"' + str(tweet.user.lang).replace("\n", " ").replace('"', "'") + '",')
-    else:
-        csv.write('"' + "NONE" + '",')
-
-    if hasattr(tweet.user, 'status'):
-        # Not sure if there needs to be more division, as I havent seen
-        csv.write('"' + str(tweet.user.status).replace("\n", " ").replace('"', "'") + '",')
-    else:
-        csv.write('"' + "NONE" + '",')
-
-    if hasattr(tweet.user, 'contributors_enabled'):
-        csv.write('"' + str(tweet.user.contributors_enabled).replace("\n", " ").replace('"', "'") + '",')
-    else:
-        csv.write('"' + "NONE" + '",')
-
-    if hasattr(tweet.user, 'is_translator'):
-        csv.write('"' + str(tweet.user.is_translator).replace("\n", " ").replace('"', "'") + '",')
-    else:
-        csv.write('"' + "NONE" + '",')
-
-    if hasattr(tweet.user, 'is_translation_enabled'):
-        csv.write('"' + str(tweet.user.is_translation_enabled).replace("\n", " ").replace('"', "'") + '",')
-    else:
-        csv.write('"' + "NONE" + '",')
-
-    if hasattr(tweet.user, 'profile_background_color'):
-        csv.write('"' + str(tweet.user.profile_background_color).replace("\n", " ").replace('"', "'") + '",')
-    else:
-        csv.write('"' + "NONE" + '",')
-
-    if hasattr(tweet.user, 'profile_background_image_url'):
-        csv.write('"' + str(tweet.user.profile_background_image_url).replace("\n", " ").replace('"', "'") + '",')
-    else:
-        csv.write('"' + "NONE" + '",')
-
-    if hasattr(tweet.user, 'profile_background_image_url_https'):
-        csv.write('"' + str(tweet.user.profile_background_image_url_https).replace("\n", " ").replace('"', "'") + '",')
-    else:
-        csv.write('"' + "NONE" + '",')
-
-    if hasattr(tweet.user, 'profile_background_tile'):
-        csv.write('"' + str(tweet.user.profile_background_tile).replace("\n", " ").replace('"', "'") + '",')
-    else:
-        csv.write('"' + "NONE" + '",')
-
-    if hasattr(tweet.user, 'profile_image_url'):
-        csv.write('"' + str(tweet.user.profile_image_url).replace("\n", " ").replace('"', "'") + '",')
-    else:
-        csv.write('"' + "NONE" + '",')
-
-    if hasattr(tweet.user, 'profile_image_url_https'):
-        csv.write('"' + str(tweet.user.profile_image_url_https).replace("\n", " ").replace('"', "'") + '",')
-    else:
-        csv.write('"' + "NONE" + '",')
-
-    if hasattr(tweet.user, 'profile_banner_url'):
-        csv.write('"' + str(tweet.user.profile_banner_url).replace("\n", " ").replace('"', "'") + '",')
-    else:
-        csv.write('"' + "NONE" + '",')
-
-    if hasattr(tweet.user, 'profile_link_color'):
-        csv.write('"' + str(tweet.user.profile_link_color).replace("\n", " ").replace('"', "'") + '",')
-    else:
-        csv.write('"' + "NONE" + '",')
-
-    if hasattr(tweet.user, 'profile_sidebar_border_color'):
-        csv.write('"' + str(tweet.user.profile_sidebar_border_color).replace("\n", " ").replace('"', "'") + '",')
-    else:
-        csv.write('"' + "NONE" + '",')
-
-    if hasattr(tweet.user, 'profile_sidebar_fill_color'):
-        csv.write('"' + str(tweet.user.profile_sidebar_fill_color).replace("\n", " ").replace('"', "'") + '",')
-    else:
-        csv.write('"' + "NONE" + '",')
-
-    if hasattr(tweet.user, 'profile_text_color'):
-        csv.write('"' + str(tweet.user.profile_text_color).replace("\n", " ").replace('"', "'") + '",')
-    else:
-        csv.write('"' + "NONE" + '",')
-
-    if hasattr(tweet.user, 'profile_use_background_image'):
-        csv.write('"' + str(tweet.user.profile_use_background_image).replace("\n", " ").replace('"', "'") + '",')
-    else:
-        csv.write('"' + "NONE" + '",')
-
-    if hasattr(tweet.user, 'has_extended_profile'):
-        csv.write('"' + str(tweet.user.has_extended_profile).replace("\n", " ").replace('"', "'") + '",')
-    else:
-        csv.write('"' + "NONE" + '",')
-
-    if hasattr(tweet.user, 'default_profile'):
-        csv.write('"' + str(tweet.user.default_profile).replace("\n", " ").replace('"', "'") + '",')
-    else:
-        csv.write('"' + "NONE" + '",')
-
-    if hasattr(tweet.user, 'default_profile_image'):
-        csv.write('"' + str(tweet.user.default_profile_image).replace("\n", " ").replace('"', "'") + '",')
-    else:
-        csv.write('"' + "NONE" + '",')
-
-    if hasattr(tweet.user, 'following'):
-        csv.write('"' + str(tweet.user.following).replace("\n", " ").replace('"', "'") + '",')
-    else:
-        csv.write('"' + "NONE" + '",')
-
-    if hasattr(tweet.user, 'follow_request_sent'):
-        csv.write('"' + str(tweet.user.follow_request_sent).replace("\n", " ").replace('"', "'") + '",')
-    else:
-        csv.write('"' + "NONE" + '",')
-
-    if hasattr(tweet.user, 'notifications'):
-        csv.write('"' + str(tweet.user.notifications).replace("\n", " ").replace('"', "'") + '",')
-    else:
-        csv.write('"' + "NONE" + '",')
-
-   # This is the end of tweet.user data
-
-    csv.write('"' + str(tweet.geo).replace("\n", " ").replace('"', "'") + '",')
-    csv.write('"' + str(tweet.coordinates).replace("\n", " ").replace('"', "'") + '",')
-    csv.write('"' + str(tweet.place).replace("\n", " ").replace('"', "'") + '",')
-    csv.write('"' + str(tweet.contributors).replace("\n", " ").replace('"', "'") + '",')
-    csv.write('"' + str(tweet.is_quote_status).replace("\n", " ").replace('"', "'") + '",')
-    csv.write('"' + str(tweet.retweet_count).replace("\n", " ").replace('"', "'") + '",')
-    csv.write('"' + str(tweet.favorite_count).replace("\n", " ").replace('"', "'") + '",')
-    csv.write('"' + str(tweet.favorited).replace("\n", " ").replace('"', "'") + '",')
-    csv.write('"' + str(tweet.retweeted).replace("\n", " ").replace('"', "'") + '",')
-
-    # Possibly_Sensitive throws us an error, so we cannot use it currently.
-    if hasattr(tweet, 'possibly_sensitive'):
-        csv.write('"' + str(tweet.possibly_sensitive) + '",')
-    else:
-        csv.write('"NoData",')
-    csv.write('"' + str(tweet.lang).replace("\n", " ").replace('"', "'") + '"')
-
-    csv.write("\n")
+        retweets = retweets + 1
 
 csv.close()
 
