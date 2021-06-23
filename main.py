@@ -8,6 +8,7 @@ auth = tweepy.OAuthHandler('KJnKoRpbIuFf7QxnhWDEzge7b', 'm08vZoaAvOcMp8I2YFhpPcC
 
 # access_token and access_token_secret go here
 auth.set_access_token('1407380455045877768-0qMk7CdEnZvTIej8mHiW7Eky17hbZF', 'ZHnNpz8CPLv0jKWL2Nskq9iDLwZraUpzL81QEjTpnaLr4')
+
 # Authorizes the tweepy api
 api = tweepy.API(auth)
 
@@ -23,7 +24,7 @@ csv = open('TwitterData.csv', 'a', encoding="utf-8")
 # Tweepy cursor info is here: https://docs.tweepy.org/en/v3.5.0/cursor_tutorial.html
 # Anyways, it was switched to this so that we can remove retweets and do lookups
 # by hashtags
-public_tweets = tweepy.Cursor(api.search, q='#HASHTAG -filter:retweets').items(100)
+public_tweets = tweepy.Cursor(api.search, q='#COVID19 OR #COVID -filter:retweets', tweet_mode='extended', lang='en').items(100)
 
 # Here is a list of all the data we are collecting/how the data is being stored in the CSV
 csv.write('created_at,id,id_str,text,entities,source,source_url,in_reply_to_status_id,in_reply_to_status_id_str,in_reply_to_user_id,in_reply_to_user_id,in_reply_to_screen_name,user_id ,user_id_str ,user_name ,user_screen_name ,user_location ,user_profile_location ,user_description ,user_url ,user_entities ,user_protected ,user_followers_count ,user_friends_count ,user_listed_count ,user_created_at ,user_favourites_count ,user_utc_offset ,user_geo_enabled ,user_verified ,user_statuses_count ,user_lang ,user_status ,user_contributors_enabled ,user_is_translator ,user_is_translation_enabled ,user_profile_background_color ,user_profile_background_image_url ,user_profile_background_image_url_https ,user_profile_background_tile ,user_profile_image_url ,user_profile_image_url_https ,user_profile_banner_url ,user_profile_link_color ,user_profile_sidebar_border_color ,user_profile_sidebar_fill_color ,user_profile_text_color ,user_profile_use_background_image ,user_has_extended_profile ,user_default_profile ,user_default_profile_image ,user_following ,user_follow_request_sent, user_notifications,geo,coordinates,place,contributors,is_quote_status,retweet_count,favorite_count,favorited,retweeted,possibly_sensitive,lang')
@@ -40,7 +41,7 @@ for tweet in public_tweets:
     # Need to convert " into ' in the text, as in order to keep commas in the text, we
     # have to put the sentence in "". Thus, if there are any sentences with a single "
     # (I ran into one during this), it will mess up the formatting
-    csv.write('"' + tweet.text.replace("\n", " ").replace('"', "'") + '",')
+    csv.write('"' + tweet.full_text.replace("\n", " ").replace('"', "'") + '",')
 
     # Entities is an object with variation in the number of elements
     # after doing a few hours of work on this, it has been decided
