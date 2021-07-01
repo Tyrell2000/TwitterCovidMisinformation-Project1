@@ -30,11 +30,12 @@ public_tweets = tweepy.Cursor(api.search, q='#Coronavirus OR #COVID -filter:retw
                               tweet_mode='extended', lang='en').items(100)
 
 # Here is a list of all the data we are collecting/how the data is being stored in the CSV
-csv.write('tweet_created_at, tweet_id_str, tweet_text, link_to_tweet, hashtags, source, user_id_str, user_name,'
-          'user_screen_name, location, profile_location, user_profile_description, url, protected, followers_count,'
-          'friends_count, listed_count, profile_created_at, favorites_count, utc_offset, geo_enabled, verified,'
-          'statuses_count, lang, status, contributors_enabled, is_translation_enabled, tweet_geo, tweet_coordinates,'
-          'tweet_place, tweet_contributors, tweet_is_quote_status, tweet_retweet_count, tweet_favorite_count')
+csv.write('tweet_created_at, tweet_id_str, tweet_text, link_to_tweet, hashtags, urls_in_text, source, user_id_str,'
+          'user_name, user_screen_name, location, profile_location, user_profile_description, url, protected,'
+          'followers_count, friends_count, listed_count, profile_created_at, favorites_count, utc_offset, geo_enabled,'
+          'verified, statuses_count, lang, status, contributors_enabled, is_translation_enabled, tweet_geo,'
+          'tweet_coordinates, tweet_place, tweet_contributors, tweet_is_quote_status, tweet_retweet_count,'
+          'tweet_favorite_count')
 csv.write('\n \n')
 
 retweets = 0
@@ -54,7 +55,13 @@ for tweet in public_tweets:
         # Need to convert " into ' in the text, as in order to keep commas in the text, we
         # have to put the sentence in "". Thus, if there are any sentences with a single "
         # (I ran into one during this), it will mess up the formatting
-        csv.write('"' + tweet.full_text.replace("\n", " ").replace('"', "'") + '",')
+        textFromTweet = tweet.full_text.replace("\n", " ").replace('"', "'")
+
+        if len(tweet.entities['urls']) > 0:
+            for i in range(len(tweet.entities['urls'])):
+                textFromTweet = textFromTweet.replace(str(tweet.entities['urls'][i]['url']), "")
+
+        csv.write('"' + textFromTweet + '",')
 
         csv.write('"' + "https:\\twitter.com\\" + str(tweet.user.screen_name).replace("\n", " ").replace('"', "'") +
                   "\\status\\" + str(tweet.id_str).replace("\n", " ").replace('"', "'") + '",')
@@ -76,6 +83,20 @@ for tweet in public_tweets:
                     hashtags = hashtags + \
                                str(tweet.entities['hashtags'][i]['text']).replace("\n", " ").replace('"', "'")
             csv.write('"' + hashtags + '",')
+        else:
+            csv.write('"' + "N/A" + '",')
+
+        ##print(tweet.entities)
+        if len(tweet.entities['urls']) > 0:
+            urls = ""
+            for i in range(len(tweet.entities['urls'])):
+                if i != len(tweet.entities['urls']) - 1:
+                    urls = urls +\
+                               str(tweet.entities['urls'][i]['url']).replace("\n", " ").replace('"', "'") + ', '
+                else:
+                    urls = urls + \
+                               str(tweet.entities['urls'][i]['url']).replace("\n", " ").replace('"', "'")
+            csv.write('"' + urls + '",')
         else:
             csv.write('"' + "N/A" + '",')
         ##csv.write('"' + str(tweet.entities['hashtag'][0]).replace("\n", " ").replace('"', "'") + '",')

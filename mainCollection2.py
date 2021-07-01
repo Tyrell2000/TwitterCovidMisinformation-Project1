@@ -16,7 +16,7 @@ api = tweepy.API(auth)
 # as it cant process tweets with emojis, ', and other stuff in it.
 # The first slot in this is to make a file, the next slot is
 # either 'w' (write), 'a' (append), or 'x' (create). https://www.w3schools.com/python/python_file_write.as
-csv = open('TwitterData.csv', 'a', encoding="utf-8")
+csv = open('C:\\Users\\tyrel\\OneDrive\\Desktop\\TwitterCovidMisinformation-Project1\\TwitterData.csv', 'w', encoding="utf-8")
 
 # To my knowledge, we do user_timeline to get specific users. User_timeline
 # does BOTH tweets and retweets on the specific twitter handle.
