@@ -36,6 +36,7 @@ csv.write('tweet_created_at, tweet_id_str, tweet_text, link_to_tweet, hashtags, 
           'verified, statuses_count, lang, status, contributors_enabled, is_translation_enabled, tweet_geo,'
           'tweet_coordinates, tweet_place, tweet_contributors, tweet_is_quote_status, tweet_retweet_count,'
           'tweet_favorite_count')
+
 csv.write('\n \n')
 
 retweets = 0
