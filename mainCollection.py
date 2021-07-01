@@ -16,7 +16,7 @@ api = tweepy.API(auth)
 # as it cant process tweets with emojis, ', and other stuff in it.
 # The first slot in this is to make a file, the next slot is
 # either 'w' (write), 'a' (append), or 'x' (create). https://www.w3schools.com/python/python_file_write.as
-csv = open('TwitterData.csv', 'w', encoding="utf-8")
+csv = open('TwitterData.csv', 'a', encoding="utf-8")
 
 # To my knowledge, we do user_timeline to get specific users. User_timeline
 # does BOTH tweets and retweets on the specific twitter handle.
@@ -24,10 +24,10 @@ csv = open('TwitterData.csv', 'w', encoding="utf-8")
 # Here is the documentation for this: https://docs.tweepy.org/en/stable/api.html#timeline-methods
 # Max number of tweets we can return is 200, unless we do a special method
 # in which case, it is 3200.
-public_tweets = tweepy.Cursor(api.search, q='#Coronavirus OR #COVID -filter:retweets -filter:replies', tweet_mode='extended', lang='en').items(100)
+public_tweets = tweepy.Cursor(api.search, q='twitch.com/joshcorpuzart -filter:retweets -filter:replies', tweet_mode='extended', lang='en').items(20)
 
 # Here is a list of all the data we are collecting/how the data is being stored in the CSV
-csv.write('tweet_created_at, id_str, tweet_text, hashtags, source, user_id_str, user_name, user_screen_name, location, profile_location, user_profile_description, url, protected, followers_count, friends_count, listed_count, profile_created_at, favorites_count, utc_offset, geo_enabled, verified, statuses_count, lang, status, contributors_enabled, is_translation_enabled, tweet_geo, tweet_coordinates, tweet_place, tweet_contributors, tweet_is_quote_status, tweet_retweet_count, tweet_favorite_count')
+# csv.write('tweet_created_at, id_str, tweet_text, hashtags, source, user_id_str, user_name, user_screen_name, location, profile_location, user_profile_description, url, protected, followers_count, friends_count, listed_count, profile_created_at, favorites_count, utc_offset, geo_enabled, verified, statuses_count, lang, status, contributors_enabled, is_translation_enabled, tweet_geo, tweet_coordinates, tweet_place, tweet_contributors, tweet_is_quote_status, tweet_retweet_count, tweet_favorite_count, tweet_link, hashtags, tweet_urls')
 csv.write('\n \n')
 
 retweets = 0
@@ -47,7 +47,16 @@ for tweet in public_tweets:
         # Need to convert " into ' in the text, as in order to keep commas in the text, we
         # have to put the sentence in "". Thus, if there are any sentences with a single "
         # (I ran into one during this), it will mess up the formatting
-        csv.write('"' + tweet.full_text.replace("\n", " ").replace('"', "'") + '",')
+        #  csv.write('"' + tweet.full_text.replace("\n", " ").replace('"', "'") + '",')
+        textFromTweet=tweet.full_text.replace("\n", " ").replace('"', "'")
+
+        if len(tweet.entities.get("urls")) > 0:
+            i=0
+            for url in tweet.entities.get("urls"):
+                textFromTweet=textFromTweet.replace(str(url.get("url")), "")
+
+        csv.write('"' + textFromTweet + '",')
+
 
         # Entities is an object with variation in the number of elements
         # after doing a few hours of work on this, it has been decided
@@ -307,6 +316,39 @@ for tweet in public_tweets:
         ##else:
             ##csv.write('"NoData",')
         ##csv.write('"' + str(tweet.lang).replace("\n", " ").replace('"', "'") + '"')
+        csv.write('"twitter.com/anyuser/status/' + str(tweet.id_str).replace("\n", " ").replace('"', "'") + '",')
+
+
+
+        print(hasattr(tweet.entities, 'hashtags'))
+        if len(tweet.entities.get("hashtags")) > 0:
+            csv.write('"')
+            i=0
+            for hashtag in tweet.entities.get("hashtags"):
+                print(i)
+                if (i == len(tweet.entities.get("hashtags")) - 1):
+                    csv.write('#' + hashtag.get("text"))
+                else:
+                    csv.write('#' + hashtag.get("text") + ',')
+                i=i+1
+            csv.write('",')
+        else:
+            csv.write('"No hashtags",')
+
+
+        if len(tweet.entities.get("urls")) > 0:
+            csv.write('"')
+            i=0
+            for url in tweet.entities.get("urls"):
+                print(i)
+                if (i == len(tweet.entities.get("urls")) - 1):
+                    csv.write('#' + url.get("expanded_url"))
+                else:
+                    csv.write('#' + url.get("expanded_url") + ',')
+                i=i+1
+            csv.write('"')
+        else:
+            csv.write('"No url"')
 
         csv.write("\n")
 
