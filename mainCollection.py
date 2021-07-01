@@ -30,7 +30,7 @@ public_tweets = tweepy.Cursor(api.search, q='#Coronavirus OR #COVID -filter:retw
                               tweet_mode='extended', lang='en').items(100)
 
 # Here is a list of all the data we are collecting/how the data is being stored in the CSV
-csv.write('tweet_created_at, id_str, tweet_text, link_to_tweet, hashtags, source, user_id_str, user_name,'
+csv.write('tweet_created_at, tweet_id_str, tweet_text, link_to_tweet, hashtags, source, user_id_str, user_name,'
           'user_screen_name, location, profile_location, user_profile_description, url, protected, followers_count,'
           'friends_count, listed_count, profile_created_at, favorites_count, utc_offset, geo_enabled, verified,'
           'statuses_count, lang, status, contributors_enabled, is_translation_enabled, tweet_geo, tweet_coordinates,'
