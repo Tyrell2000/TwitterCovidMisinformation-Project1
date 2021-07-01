@@ -35,9 +35,10 @@ retweets = 0
 # To summarize this section, I more or less just got every item in Status object
 # (the tweet) and am writing it to the CSV. https://www.geeksforgeeks.org/python-status-object-in-tweepy/
 for tweet in public_tweets:
+    ##Not collecting retweets currently
     if not tweet.retweeted:
-        print(tweet.full_text.replace("\n", " ").replace('"', "'"))
-        print(tweet.entities)
+        ##print(tweet.full_text.replace("\n", " ").replace('"', "'"))
+        ##print(tweet.entities)
         csv.write('"' + str(tweet.created_at).replace("\n", " ").replace('"', "'") + '",')
         ##csv.write('"' + str(tweet.id).replace("\n", " ").replace('"', "'") + '",')
         csv.write('"' + str(tweet.id_str).replace("\n", " ").replace('"', "'") + '",')
@@ -71,8 +72,7 @@ for tweet in public_tweets:
 
         # User is the other object with variation. However, this one we can
         # just check if certain attributes are here, and mark none if they aren't
-        # present. This also has entities, so we will just have to leave that unedited.
-        # anyways, you can skip the next like 200 lines or so, cause its all tweet.user.
+        # present. You can skip the next like 200 lines or so, cause its all tweet.user.
         # This gives us data about the user. Source: https://www.geeksforgeeks.org/python-user-object-in-tweepy/
         # The original code for writing this to a file is below:
         # csv.write(str(tweet.user) + ",")
@@ -117,9 +117,7 @@ for tweet in public_tweets:
         else:
             csv.write('"' + "NONE" + '",')
 
-        # Tested to see if there was any way I could process the data consistently
-        # with this. I could not find a way after a few hours, thus, this is
-        # unedited data.
+        ##Use this to get the unedited entities data
         ##if hasattr(tweet.user, 'entities'):
             ##csv.write('"' + str(tweet.user.entities).replace("\n", " ").replace('"', "'") + '",')
         ##else:
