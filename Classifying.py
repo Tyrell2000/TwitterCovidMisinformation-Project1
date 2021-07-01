@@ -19,6 +19,8 @@ from sklearn.svm import LinearSVC
 from sklearn.neural_network import MLPClassifier
 from matplotlib.pyplot import figure
 
+# Followed this tutorial: https://towardsdatascience.com/multi-class-text-classification-with-scikit-learn-12f1e60e0a9f
+
 twitterData = "C:\\Users\\tyrel\\OneDrive\\Desktop\\TwitterCovidMisinformation-Project1\\TwitterDataset.csv"
 
 here = ['tweet_created_at', 'id_str', 'labelled', 'tweet_text', 'hashtags', 'source', 'user_id_str', 'user_name',
