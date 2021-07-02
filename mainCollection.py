@@ -14,11 +14,25 @@ auth.set_access_token('2856969806-KuiNT2Gu8xT3vdJDhiM79ut7MPh8ximDbZYBmBy',
 # Authorizes the tweepy api
 api = tweepy.API(auth)
 
+name = input("Enter the name of the CVS file you are writting data to (file does not have to exist): ")
+
 # Make sure that when u open the csv file, it has encoding="utf-8"
 # as it cant process tweets with emojis, ', and other stuff in it.
 # The first slot in this is to make a file, the next slot is
 # either 'w' (write), 'a' (append), or 'x' (create). https://www.w3schools.com/python/python_file_write.as
-csv = open('TwitterData.csv', 'w', encoding="utf-8")
+csv = open(str(name) + '.csv', 'w', encoding="utf-8")
+
+print("NOTE: current version excludes retweets and replies. To remove this feature, get rid of the ' -filter:retweets -filter:replies' in line 43 along with any other filtering by retweets and replies: ")
+answer = input("What is the search term(s), hashtag(s), or query you would like to look up?: ")
+query = str(answer)
+
+print("A list of all languages and their abbreviations (you must must use abbreviations, like 'en' for english):")
+print("https://developer.twitter.com/en/docs/twitter-for-websites/supported-languages")
+answer = input("What language would you like the tweets in?: ")
+lang = str(answer)
+
+answer = input("How many tweets would you like? (MAX:200): ")
+num = int(answer)
 
 # To my knowledge, we do user_timeline to get specific users. User_timeline
 # does BOTH tweets and retweets on the specific twitter handle.
@@ -26,18 +40,22 @@ csv = open('TwitterData.csv', 'w', encoding="utf-8")
 # Here is the documentation for this: https://docs.tweepy.org/en/stable/api.html#timeline-methods
 # Max number of tweets we can return is 200, unless we do a special method
 # in which case, it is 3200.
-public_tweets = tweepy.Cursor(api.search, q='#Coronavirus OR #COVID -filter:retweets -filter:replies',
-                              tweet_mode='extended', lang='en').items(100)
+public_tweets = tweepy.Cursor(api.search, q= query +' -filter:retweets -filter:replies',
+                              tweet_mode='extended', lang=lang).items(num)
 
-# Here is a list of all the data we are collecting/how the data is being stored in the CSV
-csv.write('tweet_created_at, tweet_id_str, tweet_text, link_to_tweet, hashtags, urls_in_text, source, user_id_str,'
+
+answer = input("Would you like a row of text that describes what is in each column? (Y/N): ")
+YN = str(answer)
+
+if YN == ('y' or 'Y'):
+    # Here is a list of all the data we are collecting/how the data is being stored in the CSV
+    csv.write('tweet_created_at, tweet_id_str, tweet_text, link_to_tweet, hashtags, urls_in_text, source, user_id_str,'
           'user_name, user_screen_name, location, profile_location, user_profile_description, url, protected,'
           'followers_count, friends_count, listed_count, profile_created_at, favorites_count, utc_offset, geo_enabled,'
           'verified, statuses_count, lang, status, contributors_enabled, is_translation_enabled, tweet_geo,'
           'tweet_coordinates, tweet_place, tweet_contributors, tweet_is_quote_status, tweet_retweet_count,'
           'tweet_favorite_count')
-
-csv.write('\n \n')
+    csv.write('\n \n')
 
 retweets = 0
 
@@ -56,13 +74,14 @@ for tweet in public_tweets:
         # Need to convert " into ' in the text, as in order to keep commas in the text, we
         # have to put the sentence in "". Thus, if there are any sentences with a single "
         # (I ran into one during this), it will mess up the formatting
-        textFromTweet = tweet.full_text.replace("\n", " ").replace('"', "'")
+        textFromTweet=tweet.full_text.replace("\n", " ").replace('"', "'")
 
-        if len(tweet.entities['urls']) > 0:
-            for i in range(len(tweet.entities['urls'])):
-                textFromTweet = textFromTweet.replace(str(tweet.entities['urls'][i]['url']), "")
+        if len(tweet.entities.get("urls")) > 0:
+            for url in tweet.entities.get("urls"):
+                textFromTweet=textFromTweet.replace(str(url.get("url")), "")
 
         csv.write('"' + textFromTweet + '",')
+
 
         csv.write('"' + "https:\\twitter.com\\" + str(tweet.user.screen_name).replace("\n", " ").replace('"', "'") +
                   "\\status\\" + str(tweet.id_str).replace("\n", " ").replace('"', "'") + '",')
@@ -337,7 +356,7 @@ for tweet in public_tweets:
         csv.write('"' + str(tweet.contributors).replace("\n", " ").replace('"', "'") + '",')
         csv.write('"' + str(tweet.is_quote_status).replace("\n", " ").replace('"', "'") + '",')
         csv.write('"' + str(tweet.retweet_count).replace("\n", " ").replace('"', "'") + '",')
-        csv.write('"' + str(tweet.favorite_count).replace("\n", " ").replace('"', "'") + '",')
+        csv.write('"' + str(tweet.favorite_count).replace("\n", " ").replace('"', "'") + '"')
         ##csv.write('"' + str(tweet.favorited).replace("\n", " ").replace('"', "'") + '",')
         ##csv.write('"' + str(tweet.retweeted).replace("\n", " ").replace('"', "'") + '",')
 
