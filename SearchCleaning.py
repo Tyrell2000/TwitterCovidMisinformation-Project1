@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 from bs4.element import Comment
 import re
+import datetime
 from pandas import DataFrame
 
 
@@ -19,23 +20,25 @@ url1 = 'https://thehill.com/policy/healthcare/public-global-health/561627-pfizer
 url2 = 'https://www.cnn.com/2021/07/06/politics/republican-candidates-trump-election-lie/index.html'
 url3 = 'https://www.cdc.gov/'
 url4 = 'https://www.foxnews.com/us/rescuers-at-florida-condo-collapse-told-they-can-go-home-but-they-refuse'
-urls = [url1, url2, url3]
+urls = [url1, url2, url3, url4]
 
 # change this, depending on if you have a file with urls(a seed set) already. True to use an existing file, False to
 # create one
 alreadyHaveSeedSet = False
 
+date = datetime.date.today().strftime('%Y-%m-%d')
+
 # open the file with the seed set and clear it. set alreadyHaveSeedSet to False if you want to load a seed set
 # from a file
 if not alreadyHaveSeedSet:
-    seedSet = open("seedSet.txt", "a", encoding="utf-8")
+    seedSet = open("seedsset_" + str(date) + ".txt", "a", encoding="utf-8")
     seedSet.truncate(0)
 
 # use this loop if you want to load a seed set from a file. just change the file name and set alreadyHaveSeedSet to
 # True to activate this loop
 if alreadyHaveSeedSet:
     urls = []
-    seedSet = open("seedSet.txt", "r", encoding="utf-8")
+    seedSet = open("seedsset.txt", "r", encoding="utf-8")
     for url in seedSet.readlines():
         urls.append(url)
 
