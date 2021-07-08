@@ -23,7 +23,7 @@ urls = [url1, url2, url3]
 
 # change this, depending on if you have a file with urls(a seed set) already. True to use an existing file, False to
 # create one
-alreadyHaveSeedSet = True
+alreadyHaveSeedSet = False
 
 # open the file with the seed set and clear it. set alreadyHaveSeedSet to False if you want to load a seed set
 # from a file
