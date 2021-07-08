@@ -72,12 +72,11 @@ for URL in open(csvName + '.csv', 'r'):
             if getLink + '\n' not in list(open(csvName + '.csv', 'r')):
                 # print(list(open(csvName + '.csv', 'r')))
                 if link.get('href')[0] == '/' or 'http://' in link.get('href'):
-                    print(getLink)
+                    print(counter, ": " + getLink)
                     if link.get('href')[0] == '/' and getLink not in urls:
                         urls.append(getLink)
                         # print('if / is in link:' + urlparse(url).netloc + link.get('href'))
                         csv.write('http://' + urlparse(url).netloc + link.get('href'))
-
 
                     elif 'http://' in link.get('href'):
                         # print('if / is not in link:' + urlparse(url).netloc + link.get('href'))
