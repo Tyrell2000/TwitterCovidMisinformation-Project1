@@ -10,7 +10,8 @@ import datetime
 # Here is a link to learn BeautifulSoup: https://www.dataquest.io/blog/web-scraping-python-using-beautiful-soup/
 # Basically this is transforming a url into html and then we do things to extract certain parts of html
 
-# Will return a list of the names of the 5 seeds
+#Will return a list of the names of the 5 seeds
+# Url is a url, listOfLinks is the links you will be comparing to a generated link to make sure there are no duplicate links in the generated list
 def get5Seeds(url, listOfLinks):
     # To my knowledge, this is what gets the url page
     page = requests.get(url.strip())
@@ -58,6 +59,7 @@ def get5Seeds(url, listOfLinks):
 
 
 # This is for the auto generator of 1000 seeds
+# Url is a url, txtName is the text file name
 def add5SeedsToList(url, txtName):
     # To my knowlege, this is what gets the url page
     page = requests.get(url.strip())
@@ -125,7 +127,8 @@ def thousandSeedGenerator():
             break
         add5SeedsToList(URL, txtName)
 
-
+#Will check to see if any words relating to covid and the vaccines appear in the links
+# Link is the link that is being checked, fileName1 is the file with all the words that relate to the coronavirus and the vaccines in it
 def coronaTermChecker(link, fileName1):
     # This removes the \n in the lists (as they stay in when turning the file into a list of words for whatever reason)
     fileName1Words = [j.rstrip() for j in list(open(fileName1 + '.txt', 'r'))]
