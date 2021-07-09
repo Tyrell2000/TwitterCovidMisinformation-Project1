@@ -125,9 +125,11 @@ def writeNewSeeds2(currentSeedNumber):
 
     # for adding the next seed(s) to be added to the set
     for seed in nextSeeds:
+        ##print(len(urls))
         ##print("next seed:", seed)
-        if len(urls) < 100:
+        if len(urls) < lastSeed and seed not in urls:
             urls.append(seed)
+            print(len(urls))
 
 
 seedSetLength = len(urls)
