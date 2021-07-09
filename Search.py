@@ -42,10 +42,10 @@ def get5Seeds(url, listOfLinks):
                     if getLink[0] == '/':
                         getLink = 'http://' + baseLink + getLink
                         # This is how we make sure that duplicates are not made
-                        if getLink not in listOfLinks:
+                        if getLink not in listOfLinks and "#bottom-story-socials" not in getLink:
                             ##print(getLink in listOfLinks)
                             # print(list(open(txtName + '.txt', 'r')))
-                            print(listOfLinks)
+                            ##print(listOfLinks)
                             ##print(getLink)
                             listOfLinks.append(getLink)
                             fiveOrLessSeedsGenerated.append(getLink)
