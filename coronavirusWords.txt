@@ -1,0 +1,40 @@
+corona
+COVID
+Hydroxychloroquine
+Hydroxy_chloroquine
+Hydroxy chloroquine
+SARS-CoV2
+SARS_CoV2
+SARS CoV2
+delta
+Pfizer
+Moderna
+Johnson and Johnson
+Johnson & Johnson
+J and J
+j & j
+Johnson_and_Johnson
+Johnson_&_Johnson
+j_and_J
+j_&_j
+Johnson-and-Johnson
+Johnson-&-Johnson
+J-and-J
+j-&-j
+JohnsonandJohnson
+Johnson&Johnson
+JandJ
+j&j
+covaxin
+sputnik
+sputnik V
+sputnik-V
+sputnik_V
+sputnikV
+Nih
+N.i.h
+N_i_h
+N i h
+Novavax
+AstraZeneca
+sinopharm
