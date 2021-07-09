@@ -149,11 +149,11 @@ while notAtLastSeed:
         notAtLastSeed = False
 
 # write urls to seed set file
-seedSet = open(seedFileName, "a", encoding="utf-8")
 number = 0
 for url in urls:
     # calls the code to write text of url's webpage to a file
     writeWebpageText(url, str(number))
+    seedSet = open(seedFileName, "a", encoding="utf-8")
 
     # basically, if not the last url, add a newline after adding the url to the seed set
     if url != urls[lastSeed - 1]:
