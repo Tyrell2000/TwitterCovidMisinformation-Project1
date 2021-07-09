@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 from bs4.element import Comment
 import re
 import datetime
+import Search
 from pandas import DataFrame
 
 
@@ -15,32 +16,38 @@ def tag_visible(element):
 
 
 headers = {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
-url1 = 'https://thehill.com/policy/healthcare/public-global-health/561627-pfizer-vaccine-less-effective-against-delta-variant'
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) '
+                      'Chrome/50.0.2661.102 Safari/537.36'}
+url1 = 'https://thehill.com/policy/healthcare/public-global-health/561627-pfizer-vaccine-less-effective-against-delta' \
+       '-variant'
 url2 = 'https://www.cnn.com/2021/07/06/politics/republican-candidates-trump-election-lie/index.html'
 url3 = 'https://www.cdc.gov/'
 url4 = 'https://www.foxnews.com/us/rescuers-at-florida-condo-collapse-told-they-can-go-home-but-they-refuse'
-urls = [url1, url2, url3, url4]
+urls = [url1]
 
 # change this, depending on if you have a file with urls(a seed set) already. True to use an existing file, False to
 # create one
 alreadyHaveSeedSet = False
 
 date = datetime.date.today().strftime('%Y-%m-%d')
+seedFileName = "seedsset_" + str(date) + ".txt"
 
 # open the file with the seed set and clear it. set alreadyHaveSeedSet to False if you want to load a seed set
 # from a file
 if not alreadyHaveSeedSet:
-    seedSet = open("seedsset_" + str(date) + ".txt", "a", encoding="utf-8")
+    seedSet = open(seedFileName, "w", encoding="utf-8")
     seedSet.truncate(0)
+
 
 # use this loop if you want to load a seed set from a file. just change the file name and set alreadyHaveSeedSet to
 # True to activate this loop
 if alreadyHaveSeedSet:
     urls = []
-    seedSet = open("seedsset.txt", "r", encoding="utf-8")
+    seedSet = open("seedsset_2021-07-08.txt", "r", encoding="utf-8")
     for url in seedSet.readlines():
-        urls.append(url)
+        urls.append(url[:-2])
+
+
 
 seedSetLength = len(urls)
 currentSeedNumber = 0
@@ -49,6 +56,7 @@ notAtLastSeed = True
 while notAtLastSeed:
     # open web page
     page = requests.get(urls[currentSeedNumber], headers=headers)
+    print(urls[currentSeedNumber])
 
     # set soup equal to the webpage html contents
     soup = BeautifulSoup(page.content, 'html.parser')
@@ -73,14 +81,14 @@ while notAtLastSeed:
 
     # will be entered if you have specified that you are creating a seed set earlier in the code
     if not alreadyHaveSeedSet:
-        # add seeds you want to put in the seed set to this list and they will be added later for processing
-        nextSeeds = []
+        seedSet = open(seedFileName, "a", encoding="utf-8")
+
+        if len(urls) < 100:
+            # add seeds you want to put in the seed set to this list and they will be added later for processing
+            nextSeeds = Search.get5Seeds(urls[currentSeedNumber], urls)
 
         '''for i in range(2):
             nextSeeds.append("urlhere")'''
-
-        # open the seed set text file
-        seedSet = open("seedSet.txt", "a", encoding="utf-8")
 
         # write the current url to the seed list file
         seedSet.write(urls[currentSeedNumber])
