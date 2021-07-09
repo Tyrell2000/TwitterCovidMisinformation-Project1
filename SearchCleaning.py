@@ -162,5 +162,4 @@ for url in urls:
     else:
         seedSet.write(url)
     number += 1
-
-seedSet.close()
+    seedSet.close()
