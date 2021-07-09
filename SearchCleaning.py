@@ -4,7 +4,6 @@ from bs4.element import Comment
 import re
 import datetime
 import Search
-from pandas import DataFrame
 
 
 def tag_visible(element):
@@ -31,7 +30,7 @@ urls = [url1]
 '''alreadyHaveSeedSet = False'''
 
 # how many seeds you want
-lastSeed = 100
+lastSeed = 10000
 
 # today's date
 date = datetime.date.today().strftime('%Y-%m-%d')
@@ -120,6 +119,7 @@ def writeNewSeeds2(currentSeedNumber):
     if len(urls) < lastSeed:
         # add seeds you want to put in the seed set to this list and they will be added later for processing
         nextSeeds = Search.get5Seeds(urls[currentSeedNumber], urls)
+        ##print(nextSeeds, "\n")
     else:
         nextSeeds = []
 
