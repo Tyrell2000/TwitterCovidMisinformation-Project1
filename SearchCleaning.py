@@ -30,7 +30,7 @@ urls = [url1]
 '''alreadyHaveSeedSet = False'''
 
 # how many seeds you want
-lastSeed = 10000
+lastSeed = 100
 
 # today's date
 date = datetime.date.today().strftime('%Y-%m-%d')
@@ -64,7 +64,7 @@ seedSet.close()
 # write text of webpage from given url to the given file name
 def writeWebpageText(url, fileNumber):
     # open web page
-    page = requests.get(url, headers=headers)
+    page = requests.get(url.strip())
     ##print(currentSeedNumber)
     ##print(urls[currentSeedNumber])
 
@@ -72,7 +72,7 @@ def writeWebpageText(url, fileNumber):
     soup = BeautifulSoup(page.content, 'html.parser')
 
     # get all text from the webpage
-    texts = soup.findAll(text=True)
+    texts = soup.findAll('p')
 
     # filter out invisible text in the html
     visible_texts = filter(tag_visible, texts)
@@ -83,7 +83,8 @@ def writeWebpageText(url, fileNumber):
     # cleaning the text that's added to this seed's file
     for lineOfText in visible_texts:
         if lineOfText != "\n" and lineOfText != " ":
-            currentSeed.write(re.sub('[\t\n]', "", lineOfText))
+            # if you want the tags (<p>, <div>, ect still in, remove .get_text)
+            currentSeed.write(re.sub('[\t\n]', "", str(lineOfText.get_text())))
             currentSeed.write("\n")
 
     # close the file associated with this seed. we are done adding text to it
