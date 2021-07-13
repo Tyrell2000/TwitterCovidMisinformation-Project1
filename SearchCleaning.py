@@ -130,16 +130,19 @@ def writeNewSeeds2(currentSeedNumber):
         ##print("next seed:", seed)
         if len(urls) < lastSeed and seed not in urls:
             urls.append(seed)
-            print(len(urls))
+            writeWebpageText(seed, str(len(urls) - 1))
+            ##print(len(urls))
 
 
 seedSetLength = len(urls)
 currentSeedNumber = 0
 notAtLastSeed = True
+writeWebpageText(urls[0], str(0))
 # run until you have all the seeds needed
 while notAtLastSeed:
     # call the code to add more seeds, won't add more if you have your desired amount already(lastSeed)
     writeNewSeeds2(currentSeedNumber)
+    seedSet = open(seedFileName, "a", encoding="utf-8")
 
     # update the stored length of the current seed set(urls)
     seedSetLength = len(urls)
@@ -149,20 +152,11 @@ while notAtLastSeed:
 
     # if you are at the last seed needed, stop the loop
     if currentSeedNumber == seedSetLength:
+        seedSet.close()
         notAtLastSeed = False
-
-# write urls to seed set file
-number = 0
-for url in urls:
-    # calls the code to write text of url's webpage to a file
-    writeWebpageText(url, str(number))
-    seedSet = open(seedFileName, "a", encoding="utf-8")
-
-    # basically, if not the last url, add a newline after adding the url to the seed set
-    if url != urls[lastSeed - 1]:
-        seedSet.write(url)
-        seedSet.write("\n")
     else:
-        seedSet.write(url)
-    number += 1
-    seedSet.close()
+        seedSet.write(urls[currentSeedNumber])
+        if currentSeedNumber != seedSetLength - 1:
+            seedSet.write("\n")
+        ##print(len(urls), currentSeedNumber, urls[currentSeedNumber])
+        print("Seeds left to gather: ", lastSeed - currentSeedNumber)
