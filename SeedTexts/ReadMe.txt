@@ -1,0 +1,1 @@
+This directory holds all the text gathered from all the seeds in the seed set.
