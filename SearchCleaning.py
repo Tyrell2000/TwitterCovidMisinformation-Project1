@@ -39,7 +39,7 @@ date = datetime.date.today().strftime('%Y-%m-%d')
 seedFileName = "seedsset_" + str(date) + ".txt"
 
 # clear the file, just in case there is anything inside of it
-seedSet = open(seedFileName, "w", encoding="utf-8")
+seedSet = open("SeedTexts/" + seedFileName, "w", encoding="utf-8")
 seedSet.truncate(0)
 seedSet.close()
 
