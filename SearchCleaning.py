@@ -78,7 +78,7 @@ def writeWebpageText(url, fileNumber):
     visible_texts = filter(tag_visible, texts)
 
     # create/open file for this seed, named after position in the list of seeds(urls) starting from 0
-    currentSeed = open(fileNumber + ".txt", "w", encoding="utf-8")
+    currentSeed = open("SeedTexts/" + fileNumber + ".txt", "w", encoding="utf-8")
 
     # cleaning the text that's added to this seed's file
     for lineOfText in visible_texts:
