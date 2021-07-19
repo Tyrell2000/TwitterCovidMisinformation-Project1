@@ -3,7 +3,7 @@ from nltk import word_tokenize
 from nltk.corpus import stopwords
 import math
 import string
-
+import re
 
 
 # This is the second recommended way of doing term frequency
@@ -99,15 +99,12 @@ def multTFIDscoresOfTweetsAndWebpage(tweets, webpages):
         max_similar_doc = {}
         for webpage in webpages:
             results = getTweetAndWebpageTFIDF(tweet, webpage)
-            #print('result 0:' + str(results[0]))
-            #print('result 1:' + str(results[1]))
-            uniqueWords = set(results[0]).union(set(results[1]))
+            #uniqueWords = set(results[0]).union(set(results[1]))
+            uniqueWords = set(results[0])
+            #print(results[0])
             for word in uniqueWords:
-                #print(w_tAndSw_doc.get(word))
                 if w_tAndSw_doc.get(word) is not None:
-                    #print('got in here')
                     w_tAndSw_doc[word] += results[0][word] * results[1][word]
-                    #print(word +": " + 'w_tAndSw_doc[word]')
                 else:
                     w_tAndSw_doc[word] = results[0][word] * results[1][word]
 
@@ -119,23 +116,23 @@ def multTFIDscoresOfTweetsAndWebpage(tweets, webpages):
         listOfWords = set(w_tAndSw_doc).union(set(w_doc))
         for word in listOfWords:
             if w_doc[word] != 0:
-                # print(w_tAndSw_doc[word])
-                # print(w_doc[word])
                 max_similar_doc[word] = w_tAndSw_doc[word] / w_doc[word]
             else:
                 max_similar_doc[word] = 0.0
 
-        #print("Unedited : " + str(max_similar_doc))
-        max_similar_doc = sorted(max_similar_doc, key=max_similar_doc.get, reverse=True)
-        #print("Max to min: " + str(max_similar_doc))
-        #print("First 100 : " + str(list(max_similar_doc)[:100]))
-        newCol.append(list(max_similar_doc)[:100])
 
-    print(newCol)
+        max_similar_doc = sorted(max_similar_doc, key=max_similar_doc.get, reverse=True)
+        first100=' '.join(map(str, list(max_similar_doc)[:100]))
+        #print(first100)
+        newCol.append(first100.replace(" ", ","))
+        #print(newCol)
+
+    return newCol
 
 
 #Cleans a scentence
 def cleaningData(scentence):
+    scentence = re.sub(r'http\S+', '', scentence)
     tokens = word_tokenize(scentence)
     # convert to lower case
     tokens = [w.lower() for w in tokens]
@@ -160,10 +157,15 @@ numOfDocuments = input('How many documents are you reading (This will read 0 - [
 documents = []
 for i in range(int(numOfDocuments)):
     documents.append(open(str(i) +'.txt', encoding="utf-8").read())
-
 webpage = documents
 #print(webpage)
-multTFIDscoresOfTweetsAndWebpage(tweet, webpage)
+cols = multTFIDscoresOfTweetsAndWebpage(tweet, webpage)
+#print(len(cols))
+df = pd.read_csv(csvName + ".csv")
+df['context_information'] = cols
+print(df)
+df.to_csv(csvName + ".csv", index=False)
+
 
 
 '''
