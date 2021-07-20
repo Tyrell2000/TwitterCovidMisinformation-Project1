@@ -124,7 +124,7 @@ def multTFIDscoresOfTweetsAndWebpage(tweets, webpages):
         max_similar_doc = sorted(max_similar_doc, key=max_similar_doc.get, reverse=True)
         first100=' '.join(map(str, list(max_similar_doc)[:100]))
         #print(first100)
-        newCol.append(first100.replace(" ", ","))
+        newCol.append(tweet + " " + first100.replace(" ", ","))
         #print(newCol)
 
     return newCol
