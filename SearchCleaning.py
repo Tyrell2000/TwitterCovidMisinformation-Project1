@@ -2,7 +2,6 @@ import bs4
 import requests
 from bs4 import BeautifulSoup
 from bs4.element import Comment
-import re
 import datetime
 import Search
 
@@ -30,9 +29,11 @@ urls = [url1]
 # ignore this
 '''alreadyHaveSeedSet = False'''
 
+# Change this to True if the user want to enter their own keywords
 haveOwnKeywords = False
 
 if not haveOwnKeywords:
+    # The list of keywords to use for deciding which website text to save to files
     keywords = ["Fauci", "coronavirus", "COVID-19", "delta", "Pfizer"]
 else:
     keywords = []
