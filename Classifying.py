@@ -38,7 +38,7 @@ data = pd.read_csv(twitterData, names=['tweet_created_at', 'id_str', 'labelled',
                                        'contributors_enabled', 'is_translation_enabled', 'tweet_geo',
                                        'tweet_coordinates', 'tweet_place', 'tweet_contributors',
                                        'tweet_is_quote_status', 'tweet_retweet_count', 'tweet_favorite_count'],
-                   encoding='latin-1')
+                   encoding='utf-8')
 
 ##print(data.columns)
 ##print(data.isnull().sum())
