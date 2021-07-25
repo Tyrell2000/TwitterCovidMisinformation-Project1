@@ -1,28 +1,79 @@
 import pandas as pd
 from nltk import word_tokenize
+from nltk.tokenize import TweetTokenizer
 from nltk.corpus import stopwords
 import math
 import string
 import re
 
 
+'''
+ft,d is the raw count of a term in a document, i.e., the number of times that term t occurs in document d
+
+N: total number of documents in the corpus 
+
+nt: number of documents where the term appears 
+'''
+
+
+
+
+
+def computeTFRec1(numOfWords___, documents):
+    tfDict = {}
+    for word, count in numOfWords___.items():
+        tfDict[word] = count
+
+    N = len(documents)
+
+    idDict = dict.fromkeys(documents[0].keys(), 0)
+
+    for document in documents:
+        for word, val in document.items():
+            if val > 0:
+                idDict[word] += 1
+
+    for word, val in idDict.items():
+        idDict[word] = tfDict[word] * math.log(N / float(val))
+
+    return idDict
+
+def computeIDFRec1(numOfWords___, documents):
+    tfDict = {}
+    for word, count in numOfWords___.items():
+        tfDict[word] = count
+
+    N = len(documents)
+
+    idDict = dict.fromkeys(documents[0].keys(), 0)
+
+    for document in documents:
+        for word, val in document.items():
+            if val > 0:
+                idDict[word] += 1
+
+    for word, val in idDict.items():
+        idDict[word] = (0.5+(0.5 *(tfDict[word]/max(tfDict.values())) )  ) * math.log(N / float(val))
+
+    return idDict
+
+
+
 # This is the second recommended way of doing term frequency
 # in tfidf. https://en.wikipedia.org/wiki/Tf%E2%80%93idf#Term_frequency%E2%80%93Inverse_document_frequency
 # This is document term weight in the wiki article
 # This is a fomula which calculates log(1+[number of times a word appears])
-def computeTFRec2(numOfWords___, bagOfWords___):
+def computeTFRec2(numOfWords___, documents):
     tfDict = {}
-    bagOfWordsCount = len(bagOfWords___)
     for word, count in numOfWords___.items():
         tfDict[word] = math.log(count+1)
     return tfDict
 
 
-
 # This is the second recommended way of doing IDF
 # in tfidf. https://en.wikipedia.org/wiki/Tf%E2%80%93idf#Term_frequency%E2%80%93Inverse_document_frequency
 # This is query term weight in the wiki article
-# This is a fomula which calculates log(1+ ( [length of the document] / [the value of the word from term frequency] ))
+# This is a fomula which calculates log(1+ ( [length of the document] / [number of times the word appears in the document] ))
 def computeIDFRec2(documents):
     N = len(documents)
 
@@ -39,6 +90,51 @@ def computeIDFRec2(documents):
     return idDict
 
 
+
+
+
+
+def computeTFRec3(numOfWords___, documents):
+    tfDict = {}
+    for word, count in numOfWords___.items():
+        tfDict[word] = count
+
+    N = len(documents)
+
+    idDict = dict.fromkeys(documents[0].keys(), 0)
+
+    for document in documents:
+        for word, val in document.items():
+            if val > 0:
+                idDict[word] += 1
+
+    for word, val in idDict.items():
+        idDict[word] = (1 + math.log(tfDict[word])) * math.log(N / float(val))
+
+    return idDict
+
+def computeIDFRec3(numOfWords___, documents):
+    tfDict = {}
+    for word, count in numOfWords___.items():
+        tfDict[word] = count
+
+    N = len(documents)
+
+    idDict = dict.fromkeys(documents[0].keys(), 0)
+
+    for document in documents:
+        for word, val in document.items():
+            if val > 0:
+                idDict[word] += 1
+
+    for word, val in idDict.items():
+        idDict[word] = (1 + math.log(tfDict[word]) ) * math.log(N / float(val))
+
+    return idDict
+
+
+
+
 # The TF IDF is calculated by multiplying the idfs of a word by the value of the word
 def computeTFIDF(tfBagOfWords, idfs):
     tfidf = {}
@@ -46,6 +142,7 @@ def computeTFIDF(tfBagOfWords, idfs):
         tfidf[word] = val * idfs[word]
         #print(word +": " + str(tfidf[word]))
     return tfidf
+
 
 # Does the steps to doing TFIDF. This compiles the cleaning,
 # the number of words in a document, the TF, the IDF, the TFIDF
@@ -71,22 +168,36 @@ def getTweetAndWebpageTFIDF(tweet, webpage):
     #print(numOfWordsWebpage)
 
     #Computes the term frequency in tweets and webpages
-    tFtweets = computeTFRec2(numOfWordsTweets, bagOfWordsTweets)
-    tFwebpage = computeTFRec2(numOfWordsWebpage, bagOfWordsWebpage)
-    #print(tFtweets)
-    #print(tFwebpage)
+
+    tFtweets1 = computeTFRec1(numOfWordsTweets, [numOfWordsTweets, numOfWordsWebpage])
+    tFwebpage1 = computeTFRec1(numOfWordsWebpage, [numOfWordsTweets, numOfWordsWebpage])
+
+    tFtweets2 = computeTFRec2(numOfWordsTweets, [numOfWordsTweets, numOfWordsWebpage])
+    tFwebpage2 = computeTFRec2(numOfWordsWebpage, [numOfWordsTweets, numOfWordsWebpage])
+
+#    tFtweets3 = computeTFRec3(numOfWordsTweets, [numOfWordsTweets, numOfWordsWebpage])
+#    tFwebpage3 = computeTFRec3(numOfWordsWebpage, [numOfWordsTweets, numOfWordsWebpage])
+
 
     #computes idfs
-    idfs = computeIDFRec2([numOfWordsTweets, numOfWordsWebpage])
+    idfs1 = computeIDFRec1(numOfWordsTweets, [numOfWordsTweets, numOfWordsWebpage])
+    idfs2 = computeIDFRec2([numOfWordsTweets, numOfWordsWebpage])
+#    idfs3 = computeIDFRec3([numOfWordsTweets, numOfWordsWebpage])
 
     #computes tfidf
-    tfidfTweets= computeTFIDF(tFtweets,idfs)
-    tfidfWebpage= computeTFIDF(tFwebpage, idfs)
+    tfidfTweets1= computeTFIDF(tFtweets1,idfs1)
+    tfidfWebpage1= computeTFIDF(tFwebpage1, idfs1)
+
+    tfidfTweets2= computeTFIDF(tFtweets2,idfs2)
+    tfidfWebpage2= computeTFIDF(tFwebpage2, idfs2)
+
+#    tfidfTweets3= computeTFIDF(tFtweets3,idfs3)
+#    tfidfWebpage3= computeTFIDF(tFwebpage3, idfs3)
 
     #print(tfidfTweets)
     #print(tfidfWebpage)
 
-    return [tfidfTweets, tfidfWebpage]
+    return [tfidfTweets2, tfidfWebpage2]
 
 # Does the final part and create a list of 100 words with the best scores
 # in the method requested by the teachers.
@@ -121,8 +232,18 @@ def multTFIDscoresOfTweetsAndWebpage(tweets, webpages):
                 max_similar_doc[word] = 0.0
 
 
-        max_similar_doc = sorted(max_similar_doc, key=max_similar_doc.get, reverse=True)
-        first100=' '.join(map(str, list(max_similar_doc)[:100]))
+        max_similar_doc_sorted = sorted(max_similar_doc, key=max_similar_doc.get, reverse=True)
+
+        min_val= max_similar_doc[list(max_similar_doc_sorted)[-1]]
+
+        your_dict = {k: v for k, v in max_similar_doc.items() if v != min_val}
+
+        #        print(max_similar_doc.get(list(max_similar_doc)[-1]))
+
+        first100=' '.join(map(str, list(your_dict)[:100]))
+
+        #TwitterDataWithTFIDF3
+
         #print(first100)
         newCol.append(tweet + " " + first100.replace(" ", ","))
         #print(newCol)
@@ -132,20 +253,31 @@ def multTFIDscoresOfTweetsAndWebpage(tweets, webpages):
 
 #Cleans a scentence
 def cleaningData(scentence):
+    #print('starting scentence: ' + scentence)
     scentence = re.sub(r'http\S+', '', scentence)
-    tokens = word_tokenize(scentence)
+    tknzr = TweetTokenizer()
+    tokens = tknzr.tokenize(scentence)
     # convert to lower case
     tokens = [w.lower() for w in tokens]
-    # remove punctuation from each word
+
+    # filter out stop words
     table = str.maketrans('', '', string.punctuation)
-    stripped = [w.translate(table) for w in tokens]
+    stop_words = set(stopwords.words('english'))
+    words = [w for w in tokens if not w in stop_words]
+
+    stop_words_WOpunc = [w.translate(table) for w in stop_words]
+    words = [w for w in words if not w in stop_words_WOpunc]
+
+    # remove punctuation from each word
+    stripped = [w.translate(table) for w in words]
+
     # remove remaining tokens that are not alphabetic
     words = [word for word in stripped if word.isalpha()]
-    # filter out stop words
-    stop_words = set(stopwords.words('english'))
-    words = [w for w in words if not w in stop_words]
+
     #print(words[:100])
     return words
+
+
 
 csvName=input("Name of the csv file you are reading from (do not include .csv): ")
 df = pd.read_csv(csvName + '.csv', usecols=[2])
@@ -213,13 +345,7 @@ def multTFIDscoresOfTweetsAndWebpage(tweets, webpages):
     
     
     
-    
-    
-    
-    
-    
-    
-    
+
     def computeIDF(documents):
     N = len(documents)
 
@@ -257,5 +383,49 @@ def computeTFTermFrequency(numOfWords___, bagOfWords___):
         tfDict[word] = count / float(bagOfWordsCount)
     return tfDict
 
+
+
+#Cleans a scentence
+def cleaningData(scentence):
+    print('starting scentence: ' + scentence)
+    scentence = re.sub(r'http\S+', '', scentence)
+    print('Hyperlink out scentence: ' + scentence)
+    tokens = word_tokenize(scentence)
+    print('Hyperlink out scentence: ' + scentence)
+    # convert to lower case
+    tokens = [w.lower() for w in tokens]
+    # remove punctuation from each word
+    table = str.maketrans('', '', string.punctuation)
+    stripped = [w.translate(table) for w in tokens]
+    # remove remaining tokens that are not alphabetic
+    words = [word for word in stripped if word.isalpha()]
+    # filter out stop words
+    stop_words = set(stopwords.words('english'))
+    words = [w for w in words if not w in stop_words]
+    #print(words[:100])
+    return words
+   
+   
+   
+       #Computes the term frequency in tweets and webpages
+
+    tFtweets1 = computeTFRec1(numOfWordsTweets, [numOfWordsTweets, numOfWordsWebpage])
+    tFwebpage1 = computeTFRec1(numOfWordsWebpage, [numOfWordsTweets, numOfWordsWebpage])
+
+    tFtweets2 = computeTFRec2(numOfWordsTweets, [numOfWordsTweets, numOfWordsWebpage])
+    tFwebpage2 = computeTFRec2(numOfWordsWebpage, [numOfWordsTweets, numOfWordsWebpage])
+
+    tFtweets3 = computeTFRec3(numOfWordsTweets, [numOfWordsTweets, numOfWordsWebpage])
+    tFwebpage3 = computeTFRec3(numOfWordsWebpage, [numOfWordsTweets, numOfWordsWebpage])
+
+
+    #computes idfs
+    idfs1 = computeIDFRec1([numOfWordsTweets, numOfWordsWebpage])
+    idfs2 = computeIDFRec2([numOfWordsTweets, numOfWordsWebpage])
+    idfs3 = computeIDFRec3([numOfWordsTweets, numOfWordsWebpage])
+
+    #computes tfidf
+    tfidfTweets= computeTFIDF(tFtweets,idfs)
+    tfidfWebpage= computeTFIDF(tFwebpage, idfs)y
     
 '''
