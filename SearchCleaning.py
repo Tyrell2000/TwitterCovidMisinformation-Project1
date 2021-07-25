@@ -30,7 +30,7 @@ urls = [url1]
 # ignore this
 '''alreadyHaveSeedSet = False'''
 
-haveOwnKeywords = True
+haveOwnKeywords = False
 
 if not haveOwnKeywords:
     keywords = ["Fauci", "coronavirus", "COVID-19", "delta", "Pfizer"]
