@@ -165,7 +165,6 @@ while notAtLastSeed:
 
 if firstSeedValid:
     del urls[0]
-    print("yep")
 
 currentSeedNum = 0
 seedSet = open("SeedTexts/" + seedFileName, "w", encoding="utf-8")
