@@ -95,6 +95,7 @@ def writeNewSeeds(currentSeedNumber):
         nextSeeds = Search.get5Seeds(urls[currentSeedNumber], urls)
         print("seed", urls[currentSeedNumber])
         ##print(nextSeeds, "\n")
+        print(nextSeeds)
     else:
         nextSeeds = []
 

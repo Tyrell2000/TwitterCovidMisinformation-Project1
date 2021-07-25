@@ -36,7 +36,6 @@ def get5Seeds(url, listOfLinks):
 
                 # Checks to see if one of the terms in the file of terms we made is in the \blahblahblah
                 if coronaTermChecker(link.get('href'), 'coronavirusWords'):
-
                     getLink = link.get('href')
 
                     # Just some formatting because most hrefs come out as /something instead of stuff.com/something
@@ -129,6 +128,7 @@ def thousandSeedGenerator():
         if len(list(open(txtName + '.txt', 'r'))) >= 1000:
             break
         add5SeedsToList(URL, txtName)
+
 
 # Will check to see if any words relating to covid and the vaccines appear in the links Link is the link that is
 # being checked, fileName1 is the file with all the words that relate to the coronavirus and the vaccines in it

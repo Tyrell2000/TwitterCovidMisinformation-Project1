@@ -30,8 +30,25 @@ urls = [url1]
 # ignore this
 '''alreadyHaveSeedSet = False'''
 
+haveOwnKeywords = True
+
+if not haveOwnKeywords:
+    keywords = ["Fauci", "coronavirus", "COVID-19", "delta", "Pfizer"]
+else:
+    keywords = []
+
+    ## Allows the user to enter their own keywords to look for in webpages to save
+    answer = input("Enter custom keyword to search for (Enter DONE when finished): ")
+
+    while str(answer) != "DONE":
+        keywords.append(str(answer))
+        answer = input("Enter custom keyword to search for (Enter DONE when finished): ")
+
+print("Keywords:", keywords)
 # how many seeds you want
-lastSeed = 10
+seedAnswer = input("How many seeds would you like to gather? ")
+lastSeed = int(seedAnswer)
+print("Seeds to Gather:", lastSeed)
 
 # today's date
 date = datetime.date.today().strftime('%Y-%m-%d')
@@ -44,10 +61,19 @@ seedSet = open("SeedTexts/" + seedFileName, "w", encoding="utf-8")
 seedSet.truncate(0)
 seedSet.close()
 
+seedSetUrls = []
+
+textSaved = []
+
 this = []
 
+firstSeedValid = False
+
+
 # write text of webpage from given url to the given file name
-def writeWebpageText(url, fileNumber):
+def writeWebpageText(url):
+    writeThisSeed = False
+
     # open web page
     page = requests.get(url.strip())
     ##print(currentSeedNumber)
@@ -62,9 +88,6 @@ def writeWebpageText(url, fileNumber):
     # filter out invisible text in the html
     visible_texts = filter(tag_visible, texts)
 
-    # create/open file for this seed, named after position in the list of seeds(urls) starting from 0
-    currentSeed = open("SeedTexts/" + fileNumber + ".txt", "w", encoding="utf-8")
-
     here = []
     # cleaning the text that's added to this seed's file
     for lineOfText in visible_texts:
@@ -76,19 +99,33 @@ def writeWebpageText(url, fileNumber):
                 if isinstance(x, bs4.element.NavigableString):
                     text.append(x.strip())
 
-            if " ".join(text) not in here and " ".join(text) not in this:
-                here.append(" ".join(text))
-                this.append(" ".join(text))
-                currentSeed.write(" ".join(text))
-                currentSeed.write("\n")
+            for keyword in keywords:
+                if keyword in " ".join(text):
+                    if " ".join(text) not in here and " ".join(text) not in this:
+                        ##print(keyword)
+                        here.append(" ".join(text))
+                        this.append(" ".join(text))
+                        writeThisSeed = True
 
-    # close the file associated with this seed. we are done adding text to it
-    currentSeed.close()
+    if writeThisSeed:
+        textSaved.append(here)
+        seedSetUrls.append(url)
+        if len(urls) != 1:
+            del urls[-1]
+        else:
+            global firstSeedValid
+            firstSeedValid = True
+        print("Seeds Gathered:", str(len(seedSetUrls)) + "/" + str(lastSeed))
+    else:
+        if not writeThisSeed and firstSeedValid:
+            print("Seeds Skipped:", str(len(urls) - 1))
+        else:
+            print("Seeds Skipped:", str(len(urls)))
 
 
 # gather the seeds and add them to the list: urls, until you have *lastSeed* amount
 def writeNewSeeds2(currentSeedNumber):
-    if len(urls) < lastSeed:
+    if len(seedSetUrls) < lastSeed:
         # add seeds you want to put in the seed set to this list and they will be added later for processing
         nextSeeds = Search.get5Seeds(urls[currentSeedNumber], urls)
         ##print(nextSeeds, "\n")
@@ -99,34 +136,56 @@ def writeNewSeeds2(currentSeedNumber):
     for seed in nextSeeds:
         ##print(len(urls))
         ##print("next seed:", seed)
-        if len(urls) < lastSeed and seed not in urls:
+        if len(seedSetUrls) < lastSeed and seed not in urls:
             urls.append(seed)
-            writeWebpageText(seed, str(len(urls) - 1))
-            print("Seeds left to gather: ", lastSeed - len(urls) + 1)
+            writeWebpageText(seed)
             ##print(len(urls))
 
 
 seedSetLength = len(urls)
 currentSeedNumber = 0
 notAtLastSeed = True
-writeWebpageText(urls[0], str(0))
+writeWebpageText(urls[0])
 # run until you have all the seeds needed
 while notAtLastSeed:
     # call the code to add more seeds, won't add more if you have your desired amount already(lastSeed)
     writeNewSeeds2(currentSeedNumber)
-    seedSet = open(seedFileName, "a", encoding="utf-8")
 
     # update the stored length of the current seed set(urls)
-    seedSetLength = len(urls)
+    seedSetLength = len(seedSetUrls)
 
     # increment the current seed in the set by 1
     currentSeedNumber += 1
 
     # if you are at the last seed needed, stop the loop
-    if currentSeedNumber == seedSetLength:
-        seedSet.close()
+    if lastSeed == seedSetLength:
         notAtLastSeed = False
+
+##print(textSaved[0])
+
+if firstSeedValid:
+    del urls[0]
+    print("yep")
+
+currentSeedNum = 0
+seedSet = open("SeedTexts/" + seedFileName, "w", encoding="utf-8")
+for text in textSaved:
+    # create/open file for this seed, named after position in the list of seeds(urls) starting from 0
+    currentSeed = open("SeedTexts/" + str(currentSeedNum) + ".txt", "w", encoding="utf-8")
+    for lineOfText in text:
+        if text != textSaved[-1:][0]:
+            currentSeed.write(lineOfText)
+            currentSeed.write("\n")
+        else:
+            currentSeed.write(lineOfText)
+    if currentSeedNum == lastSeed - 1:
+        seedSet.write(seedSetUrls[currentSeedNum])
     else:
-        seedSet.write(urls[currentSeedNumber])
-        if currentSeedNumber != seedSetLength - 1:
-            seedSet.write("\n")
+        seedSet.write(seedSetUrls[currentSeedNum])
+        seedSet.write("\n")
+    currentSeedNum += 1
+
+    # close the file associated with this seed. we are done adding text to it
+    currentSeed.close()
+
+seedSet.close()
