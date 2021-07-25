@@ -52,7 +52,7 @@ df.columns = ["text", "label"]
 
 ##print(df.head)
 
-tfidf = TfidfVectorizer(sublinear_tf=True, min_df=5, norm='l2', encoding='latin-1', ngram_range=(1, 2),
+tfidf = TfidfVectorizer(sublinear_tf=True, min_df=5, norm='l2', encoding='utf-8', ngram_range=(1, 2),
                         stop_words='english')
 
 features = tfidf.fit_transform(df.text).toarray()
