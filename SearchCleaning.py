@@ -17,24 +17,24 @@ def tag_visible(element):
 headers = {
     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) '
                   'Chrome/50.0.2661.102 Safari/537.36'}
-url1 = 'https://thehill.com/policy/healthcare/public-global-health/561627-pfizer-vaccine-less-effective-against-delta' \
-       '-variant'
-url2 = 'https://www.cnn.com/2021/07/06/politics/republican-candidates-trump-election-lie/index.html'
-url3 = 'https://www.cdc.gov/'
-url4 = 'https://www.foxnews.com/us/rescuers-at-florida-condo-collapse-told-they-can-go-home-but-they-refuse'
-urls = [url1]
 
-# change this, depending on if you have a file with urls(a seed set) already. True to use an existing file, False to
-# create one
-# ignore this
-'''alreadyHaveSeedSet = False'''
+urls = []
+
+startingSeeds = open("StartingSeedLinks.txt", "r", encoding="utf-8")
+for line in startingSeeds.readlines():
+    urls.append(line[:-1])
+
 
 # Change this to True if the user want to enter their own keywords
 haveOwnKeywords = False
 
 if not haveOwnKeywords:
     # The list of keywords to use for deciding which website text to save to files
-    keywords = ["Fauci", "coronavirus", "COVID-19", "delta", "Pfizer"]
+    keywords = []
+
+    searchWords = open("coronavirusWords.txt", "r", encoding="utf-8")
+    for line in searchWords.readlines():
+        keywords.append(line[:-1])
 else:
     keywords = []
 
@@ -45,10 +45,12 @@ else:
         keywords.append(str(answer))
         answer = input("Enter custom keyword to search for (Enter DONE when finished): ")
 
+print("Starting Seeds:", urls)
 print("Keywords:", keywords)
 # how many seeds you want
 seedAnswer = input("How many seeds would you like to gather? ")
 lastSeed = int(seedAnswer)
+##lastSeed = int("10")
 print("Seeds to Gather:", lastSeed)
 
 # today's date
@@ -58,21 +60,19 @@ date = datetime.date.today().strftime('%Y-%m-%d')
 seedFileName = "seedsset_" + str(date) + ".txt"
 
 # clear the file, just in case there is anything inside of it
-seedSet = open("SeedTexts/" + seedFileName, "w", encoding="utf-8")
+seedSet = open("pages/" + seedFileName, "w", encoding="utf-8")
 seedSet.truncate(0)
 seedSet.close()
 
 seedSetUrls = []
-
 textSaved = []
-
 this = []
-
-firstSeedValid = False
+seedsSkipped = 0
 
 
 # write text of webpage from given url to the given file name
 def writeWebpageText(url):
+    global seedsSkipped
     writeThisSeed = False
 
     # open web page
@@ -111,24 +111,56 @@ def writeWebpageText(url):
     if writeThisSeed:
         textSaved.append(here)
         seedSetUrls.append(url)
-        if len(urls) != 1:
-            del urls[-1]
-        else:
-            global firstSeedValid
-            firstSeedValid = True
         print("Seeds Gathered:", str(len(seedSetUrls)) + "/" + str(lastSeed))
+
+        try:
+            # create/open file for this seed, named after position in the list of seeds(urls) starting from 0
+            currentSeed = open("pages/" + str(len(seedSetUrls)) + ".txt", "w", encoding="utf-8")
+            for lineOfText in textSaved[len(seedSetUrls) - 1]:
+                if text != textSaved[-1:][0]:
+                    currentSeed.write(lineOfText)
+                    currentSeed.write("\n")
+                else:
+                    currentSeed.write(lineOfText)
+
+            # close the file associated with this seed. we are done adding text to it
+            currentSeed.close()
+
+            if len(seedSetUrls) == 1:
+                seedSet = open("pages/" + seedFileName, "w", encoding="utf-8")
+                seedSet.write(url)
+                seedSet.write("\n")
+                seedSet.close()
+            else:
+                if len(seedSetUrls) != lastSeed:
+                    seedSet = open("pages/" + seedFileName, "a", encoding="utf-8")
+                    seedSet.write(url)
+                    seedSet.write("\n")
+                    seedSet.close()
+                else:
+                    seedSet = open("pages/" + seedFileName, "a", encoding="utf-8")
+                    seedSet.write(url)
+                    seedSet.close()
+        except:
+            print("A seed had a problem.")
+
+
     else:
-        if not writeThisSeed and firstSeedValid:
-            print("Seeds Skipped:", str(len(urls) - 1))
-        else:
-            print("Seeds Skipped:", str(len(urls)))
+        if not writeThisSeed:
+            seedsSkipped += 1
+            print("Seeds Skipped:", seedsSkipped)
 
 
 # gather the seeds and add them to the list: urls, until you have *lastSeed* amount
 def writeNewSeeds2(currentSeedNumber):
     if len(seedSetUrls) < lastSeed:
         # add seeds you want to put in the seed set to this list and they will be added later for processing
-        nextSeeds = Search.get5Seeds(urls[currentSeedNumber], urls)
+        try:
+            nextSeeds = Search.get5Seeds(urls[currentSeedNumber], urls)
+        except:
+            print("This link just threw an error:", str(urls[currentSeedNumber]) + ".", "It will not be used to "
+                                                                                        "collect more seeds.")
+            nextSeeds = []
         ##print(nextSeeds, "\n")
     else:
         nextSeeds = []
@@ -143,49 +175,84 @@ def writeNewSeeds2(currentSeedNumber):
             ##print(len(urls))
 
 
-seedSetLength = len(urls)
-currentSeedNumber = 0
-notAtLastSeed = True
-writeWebpageText(urls[0])
-# run until you have all the seeds needed
-while notAtLastSeed:
-    # call the code to add more seeds, won't add more if you have your desired amount already(lastSeed)
-    writeNewSeeds2(currentSeedNumber)
-
-    # update the stored length of the current seed set(urls)
+try:
     seedSetLength = len(seedSetUrls)
+    currentSeedNumber = 0
+    notAtLastSeed = True
+    # run until you have all the seeds needed
+    while notAtLastSeed:
+        # call the code to add more seeds, won't add more if you have your desired amount already(lastSeed)
+        writeNewSeeds2(currentSeedNumber)
 
-    # increment the current seed in the set by 1
-    currentSeedNumber += 1
+        # update the stored length of the current seed set(urls)
+        seedSetLength = len(seedSetUrls)
 
-    # if you are at the last seed needed, stop the loop
-    if lastSeed == seedSetLength:
-        notAtLastSeed = False
+        # increment the current seed in the set by 1
+        currentSeedNumber += 1
+
+        # if you are at the last seed needed, stop the loop
+        if lastSeed == seedSetLength:
+            notAtLastSeed = False
+except:
+    seedSet = open("pages/" + seedFileName, "w", encoding="utf-8")
+    for seedUrl in seedSetUrls:
+        if seedSetUrls[len(seedSetUrls) - 1] == seedUrl:
+            seedSet.write(seedUrl)
+        else:
+            seedSet.write(seedUrl)
+            seedSet.write("\n")
+    seedSet.close()
+
+
+seedSet = open("pages/" + seedFileName, "w", encoding="utf-8")
+for seedUrl in seedSetUrls:
+    if seedSetUrls[len(seedSetUrls) - 1] == seedUrl:
+        seedSet.write(seedUrl)
+    else:
+        seedSet.write(seedUrl)
+        seedSet.write("\n")
+seedSet.close()
 
 ##print(textSaved[0])
 
-if firstSeedValid:
-    del urls[0]
-
-currentSeedNum = 0
-seedSet = open("SeedTexts/" + seedFileName, "w", encoding="utf-8")
-for text in textSaved:
-    # create/open file for this seed, named after position in the list of seeds(urls) starting from 0
-    currentSeed = open("SeedTexts/" + str(currentSeedNum) + ".txt", "w", encoding="utf-8")
-    for lineOfText in text:
-        if text != textSaved[-1:][0]:
-            currentSeed.write(lineOfText)
-            currentSeed.write("\n")
+'''
+try:
+    currentSeedNum = 0
+    seedSet = open("pages/" + seedFileName, "w", encoding="utf-8")
+    for text in textSaved:
+        # create/open file for this seed, named after position in the list of seeds(urls) starting from 0
+        currentSeed = open("pages/" + str(currentSeedNum) + ".txt", "w", encoding="utf-8")
+        for lineOfText in text:
+            if text != textSaved[-1:][0]:
+                currentSeed.write(lineOfText)
+                currentSeed.write("\n")
+            else:
+                currentSeed.write(lineOfText)
+        if currentSeedNum == lastSeed - 1:
+            seedSet.write(seedSetUrls[currentSeedNum])
         else:
-            currentSeed.write(lineOfText)
-    if currentSeedNum == lastSeed - 1:
-        seedSet.write(seedSetUrls[currentSeedNum])
-    else:
-        seedSet.write(seedSetUrls[currentSeedNum])
-        seedSet.write("\n")
-    currentSeedNum += 1
+            seedSet.write(seedSetUrls[currentSeedNum])
+            seedSet.write("\n")
+        currentSeedNum += 1
 
-    # close the file associated with this seed. we are done adding text to it
-    currentSeed.close()
+        # close the file associated with this seed. we are done adding text to it
+        currentSeed.close()
+
+except Exception as e:
+    seedSet = open("pages/" + seedFileName, "w", encoding="utf-8")
+    for seedUrl in seedSetUrls:
+        if seedSetUrls[len(seedSetUrls) - 1] == seedUrl:
+            seedSet.write(seedUrl)
+        else:
+            seedSet.write(seedUrl)
+            seedSet.write("\n")
+    seedSet.close()
+    try:
+        currentSeed.close()
+    except:
+        p = 0
+
+    print("Error! Stopping seed text gathering.")
 
 seedSet.close()
+'''
