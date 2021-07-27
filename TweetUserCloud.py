@@ -74,14 +74,20 @@ def get_following(screen_name):
     print('Getting Following list of ', screen_name)
     users = tweepy.Cursor(api.friends, screen_name='@' + screen_name,
                           wait_on_rate_limit=True)
+    followerNum = 0
     try:
         for user in users.items():
+            followerNum += 1
             try:
                 if screen_name not in tweetUserCloudPreliminary:
                     tweetUserCloudPreliminary[screen_name] = [str(user.screen_name)]
+                    print("Adding", str(user.screen_name), "to", screen_name + "'s", "preliminary cloud.", "Follower #"
+                          + str(followerNum))
                 else:
                     tweetUserCloudPreliminary[screen_name].append(str(user.screen_name))
-                time.sleep(5)
+                    print("Adding", str(user.screen_name), "to", screen_name + "'s", "preliminary cloud.", "Follower #"
+                          + str(followerNum))
+                time.sleep(1)
             except tweepy.TweepError as e:
                 print("Going to sleep:", e)
                 time.sleep(60)
@@ -89,6 +95,7 @@ def get_following(screen_name):
         print("Going to sleep:", e)
         time.sleep(60)
 
+    print("Beginning preliminary cloud filtering for", screen_name)
     for following in tweetUserCloudPreliminary[screen_name]:
         if following in listOfUsers:
             if name not in tweetUserCloud:
