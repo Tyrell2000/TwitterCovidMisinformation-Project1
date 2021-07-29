@@ -1,0 +1,4 @@
+COVID-19 studies published in CDC’s Morbidity and Mortality Weekly Report (MMWR)
++ COVID-19 tests conducted by public and private laboratories
++ million people who have received at least one dose of a COVID-19 vaccine
+million people who have been fully vaccinated with a COVID-19 vaccine

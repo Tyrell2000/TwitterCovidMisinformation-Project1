@@ -1,0 +1,1 @@
+ Data source: (March 1, 2020 through June 26, 2021). Numbers are ratios of age-adjusted rates standardized to the 2019 US standard COVID-NET catchment population.

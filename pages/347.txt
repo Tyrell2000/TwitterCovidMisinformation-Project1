@@ -1,0 +1,3 @@
+(adapted from the NIH COVID-19 Treatment Guidelines)
+: Individuals who have any of the various signs and symptoms of COVID-19 (e.g., fever, cough, sore throat, malaise, headache, muscle pain) without shortness of breath, dyspnea, or abnormal chest imaging.
+In pediatric patients, radiographic abnormalities are common and, for the most part, should not be used as the sole criteria to define COVID-19 illness category. Normal values for respiratory rate also vary with age in children, thus hypoxia should be the primary criterion to define severe illness, especially in younger children.

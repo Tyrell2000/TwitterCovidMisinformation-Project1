@@ -1,0 +1,7 @@
+The latest coronavirus outbreak (COVID-19) is a disease which has affected most, if not all, countries in the world.
+This interactive chart maps public information campaigns on COVID-19.
+The OxCGRT is missing data for many countries at level 1 “public officials urging caution about COVID-19”, and so most countries only have data for levels 0 and 2.
+This interactive chart maps government policies on testing for COVID-19. Note that this relates to PCR testing for the virus only; it does not include non-PCR, antibody testing.
+This interactive chart maps government policies on contract tracing for COVID-19.
+This interactive chart maps which governments provide income support to workers during the COVID-19 pandemic.
+This interactive chart maps which governments provide debt or contract relief to citizens during the COVID-19 pandemic.

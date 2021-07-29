@@ -1,0 +1,17 @@
+In this page we provide data on hospitalizations and intensive care (ICU) admissions due to Coronavirus (COVID-19). The data here is sourced from the (ECDC), who provide these statistics only for a select number of European countries, the , the for the United States, the for Canada, the for Algeria, and the for Israel.
+Unfortunately, we are unable to provide data on hospitalizations for other countries. There is currently no global, aggregated database on COVID-19 hospitalization, and our team at does not have the capacity to build such a dataset. All data on hospitalizations in this page will be updated on a .
+How do COVID-19 hospitalizations compare when we ?
+This chart shows the total number of patients in hospital due to Coronavirus (COVID-19) on a given date.
+Note that this is distinct from the weekly new number of people admitted to hospital due to COVID-19. You find this metric in the next section.
+How do weekly new COVID-19 hospitalizations compare when we ?
+This chart shows the weekly number of new hospitalizations due to COVID-19.
+Note that this number is distinct from the total number of patients in hospital due to COVID-19 at any given time. You find this data in the previous section.
+How do the number of COVID-19 patients in ICU compare when we ?
+This chart shows the total number of patients in intensive care units (ICU) due to Coronavirus (COVID-19) on a given date.
+Note that this is distinct from the weekly new number of people admitted to ICU due to COVID-19. You find this metric in the next section.
+Since no global database on hospitalizations and ICU admissions is available, we currently rely on hospitalization data published by the European CDC and the COVID Tracking Project. Unlike confirmed cases and deaths, hospitalization data is only available for a select number of European countries and the United States from these sources.
+How do weekly new ICU admissions for COVID-19 compare when we ?
+This chart shows the number of new admissions to intensive care units (ICU) due to COVID-19.
+Note that this number is distinct from the total number of patients in ICU due to COVID-19 at any given time. You find this data in the previous section.
+There is currently no aggregated database on COVID-19 hospitalizations. Our team at does not have the capacity to build such a database, and are therefore unable to add or show hospitalization data for countries not included in these datasets.
+The European Centre for Disease Prevention and Control ECDC provides three statistical resources on the COVID-19 pandemic:

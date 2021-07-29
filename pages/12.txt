@@ -1,0 +1,8 @@
+Download our complete dataset of COVID-19 metrics on GitHub. It’s open access and free for anyone to use.
+Explore our global dataset on COVID-19 vaccinations.
+Explore the data on confirmed COVID-19 cases for all countries.
+Explore the data on confirmed COVID-19 deaths for all countries.
+Explore our data on COVID-19 testing to see how confirmed cases compare to actual infections.
+See data on how many people are being hospitalized for COVID-19.
+Learn what we know about the mortality risk of COVID-19 and explore the data used to calculate it.
+Compare the number of deaths from all causes during COVID-19 to the years before to gauge the total impact of the pandemic on deaths.

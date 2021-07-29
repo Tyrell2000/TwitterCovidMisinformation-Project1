@@ -1,4 +1,10 @@
-k = [["hello", "hi"], ["ye", "ho"]]
+import twint
+import nest_asyncio
 
-print(k[-1:][0])
-print(k[-1:][0] == ["ye", "ho"])
+nest_asyncio.apply()
+c = twint.Config()
+c.Username = "brendan_webdev"
+c.Followers = True
+c.Resume = "resume.txt"
+c.Output = "testing.csv"
+twint.run.Following(c)

@@ -1,0 +1,2 @@
+A tool to help you understand COVID-19 testing options. The tool helps individuals determine what type of test they should seek. After test results are in, the tool can help interpret test results and guide next steps.
+Two kinds of tests are available for COVID-19. A viral test may tell you if you have a current infection with the virus that causes COVID-19.

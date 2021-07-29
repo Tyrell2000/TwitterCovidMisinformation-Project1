@@ -1,0 +1,9 @@
+A tool to prevent the spread of COVID-19
+Antigen tests are an effective tool to help employers prevent the spread COVID-19 in the workplace. Antigen tests, when used for screening employees in non-healthcare workplaces, can detect current infection before an employee enters the workplace or returns to work. Antigen tests are
+Testing for the virus that causes COVID-19 should be offered as part of a . When developing a plan for employee testing, an employer must consider several factors including
+There are two main ways employers can provide antigen tests to screen employees for the virus that causes COVID-19.
+If an employee with no symptoms and no known exposure to COVID-19 receives a they should and quarantine while waiting for that result to . detect the virus’s genetic material and are commonly used in laboratories. These tests are typically more accurate but take longer to process results than other types of tests.
+If the  , the employee has been infected with the virus that causes COVID-19. The employee should
+Employees who test negative can work. A negative test result does not mean the employee is not infected or will not get sick. The employee could become sick after the test, or they could be exposed to the virus that causes COVID-19 after the test. They should continue to take steps to
+The Coronavirus Aid, Relief, Economic Security (CARES) Act requires laboratories to report test results to state or local health departments. Sharing results with local public health authorities supports efforts to slow the spread of COVID-19.
+Repeatedly testing employees can help detect infections and prevent COVID-19 from spreading to other workers. CDC recommends using two over the past 7 days to decide how often to test employees

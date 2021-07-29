@@ -66,6 +66,7 @@ for item in thisdict:
             print("okayyyyyyy")
 
 print("brand" in thisdict)'''
+skippedUsers = []
 
 start = time.time()
 
@@ -81,35 +82,41 @@ def get_following(screen_name):
             try:
                 if screen_name not in tweetUserCloudPreliminary:
                     tweetUserCloudPreliminary[screen_name] = [str(user.screen_name)]
-                    print("Adding", str(user.screen_name), "to", screen_name + "'s", "preliminary cloud.", "Follower #"
+                    print("Adding", str(user.screen_name), "to", screen_name + "'s", "preliminary cloud.", "Following #"
                           + str(followerNum))
                 else:
                     tweetUserCloudPreliminary[screen_name].append(str(user.screen_name))
-                    print("Adding", str(user.screen_name), "to", screen_name + "'s", "preliminary cloud.", "Follower #"
+                    print("Adding", str(user.screen_name), "to", screen_name + "'s", "preliminary cloud.", "Following #"
                           + str(followerNum))
                 time.sleep(1)
             except tweepy.TweepError as e:
-                print("Going to sleep:", e)
+                print("Following for-loop going to sleep:", e)
                 time.sleep(60)
+                continue
     except tweepy.TweepError as e:
-        print("Going to sleep:", e)
+        print("Following for-loop failed, going to sleep:", e)
         time.sleep(60)
 
     print("Beginning preliminary cloud filtering for", screen_name)
-    for following in tweetUserCloudPreliminary[screen_name]:
-        if following in listOfUsers:
-            if name not in tweetUserCloud:
-                tweetUserCloud[name] = [following]
-            else:
-                tweetUserCloud[name].append(following)
-            print(name, "follows", following)
+    try:
+        for following in tweetUserCloudPreliminary[screen_name]:
+            if following in listOfUsers:
+                if name not in tweetUserCloud:
+                    tweetUserCloud[name] = [following]
+                else:
+                    tweetUserCloud[name].append(following)
+                print(name, "follows", following)
 
-    print('Fetched number of following for ' + screen_name + ' : ', len(tweetUserCloudPreliminary[screen_name]))
+        print('Fetched number of following for ' + screen_name + ' : ', len(tweetUserCloudPreliminary[screen_name]))
+    except Exception as e:
+        print("Analysis Attempt Error:", str(e) + ".", "Skipping user:", screen_name)
+        skippedUsers.append(screen_name)
 
 
-for user in df["username"][:-106]:
+for user in df["username"]:
     get_following(user)
 
+print("Skipped Users:", skippedUsers)
 '''
 start = time.time()
 

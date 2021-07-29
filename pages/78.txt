@@ -1,0 +1,10 @@
+This chart shows the number of confirmed COVID-19 cases per day.
+How do the number of tests compare to the number of confirmed COVID-19 cases? See them plotted against each other.
+The previous charts looked at the number of confirmed cases per day – this chart shows since the beginning of the COVID-19 pandemic.
+The following charts provide the breakdown of analyzed virus sequences by variant. Only a fraction of all confirmed cases are sequenced, so this may not always reflect the complete breakdown of COVID cases.
+Cases of COVID-19 – as with other diseases – are broadly defined under a three-level system: , and cases.
+Typically, for a case to be confirmed, a person must have a positive result from laboratory tests. This is true regardless of whether they have shown symptoms of COVID-19 or not.
+To understand the scale of the COVID-19 outbreak, and respond appropriately, we would want to know how many people are infected by COVID-19. We would want to know the number of cases.
+However, the actual number of COVID-19 cases is not known. When media outlets claim to report the ‘number of cases’ they are not being precise and omit to say that it is the number of they speak about.
+Since an understanding of testing for COVID-19 is crucial for an interpretation of the reported numbers of confirmed cases we have looked into the testing for COVID-19 in more detail.
+The US, for example, uses the following : “A confirmed case or death is defined by meeting confirmatory laboratory evidence for COVID-19. A probable case or death is defined by i) meeting clinical criteria AND epidemiologic evidence with no confirmatory laboratory testing performed for COVID-19; or ii) meeting presumptive laboratory evidence AND either clinical criteria OR epidemiologic evidence; or iii) meeting vital records criteria with no confirmatory laboratory testing performed for COVID19.”
