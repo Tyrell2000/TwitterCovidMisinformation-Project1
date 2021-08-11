@@ -1,14 +1,34 @@
 corona
+корона
+电晕
+korona
+coronavirus
+коронавирус
+新冠病毒
+koronavirüs
 COVID
+COVID-19
+冠状病毒
+KOVİD
 Hydroxychloroquine
+Гидроксихлорохин
+羟氯喹
+hidroksiklorokin
+Hidroxicloroquina
 Hydroxy_chloroquine
 Hydroxy chloroquine
 SARS-CoV2
 SARS_CoV2
 SARS CoV2
 delta
+дельта
+三角洲
+Pfizer
+辉瑞
 Pfizer
 Moderna
+摩登纳
+modern
 Johnson and Johnson
 Johnson & Johnson
 J and J
@@ -18,6 +38,10 @@ Johnson_&_Johnson
 j_and_J
 j_&_j
 Johnson-and-Johnson
+Джонсон-и-Джонсон
+强生公司
+Johnson ve Johnson
+Johnson y Johnson
 Johnson-&-Johnson
 J-and-J
 j-&-j
@@ -26,9 +50,17 @@ Johnson&Johnson
 JandJ
 j&j
 covaxin
+коваксин
+卡瓦辛
+kovaksin
+covaxina
 sputnik
+спутник
+人造卫星
 sputnik V
 sputnik-V
+спутник-В
+人造卫星V
 sputnik_V
 sputnikV
 Nih
@@ -36,5 +68,13 @@ N.i.h
 N_i_h
 N i h
 Novavax
+Новавакс
+诺瓦克斯
 AstraZeneca
+АстраЗенека
+阿斯利康
 sinopharm
+синофарм
+国药集团
+sinofarm
+sinofarma

@@ -34,25 +34,31 @@ def get5Seeds(url, listOfLinks):
             # Checks if the href is actually there (at least one letter)
             if len(link.get('href')) > 0:
 
-                # Checks to see if one of the terms in the file of terms we made is in the \blahblahblah
-                if coronaTermChecker(link.get('href'), 'coronavirusWords'):
-                    getLink = link.get('href')
+                if "pdf" not in link.get('href') and "zIp" not in link.get('href') and "zip" not in link.get('href') \
+                        and "win" not in link.get('href') and "mp3" not in link.get('href') and "mp4" not in \
+                        link.get('href') and "jpg" not in link.get('href') and "JPEG" not in link.get('href') and \
+                        "jpeg" not in link.get('href') and "docx" not in link.get('href') and "pptx" not in \
+                        link.get('href') and "png" not in link.get('href'):
 
-                    # Just some formatting because most hrefs come out as /something instead of stuff.com/something
-                    if getLink[0] == '/':
-                        getLink = 'http://' + baseLink + getLink
-                        # This is how we make sure that duplicates are not made
-                        if getLink not in listOfLinks and getLink not in fiveOrLessSeedsGenerated and "#bottom-story-socials" not in getLink:
-                            ##print(getLink in listOfLinks)
-                            # print(list(open(txtName + '.txt', 'r')))
-                            ##print(listOfLinks[0])
-                            ##print(getLink)
-                            fiveOrLessSeedsGenerated.append(getLink)
-                            # Adds 1 to counter to make sure that we are getting 5 or less seeds from a seed (as
-                            # requested from teachers)
-                            counter += 1
-                        if counter == 5:
-                            break
+                    # Checks to see if one of the terms in the file of terms we made is in the \blahblahblah
+                    if coronaTermChecker(link.get('href'), 'coronavirusWords'):
+                        getLink = link.get('href')
+
+                        # Just some formatting because most hrefs come out as /something instead of stuff.com/something
+                        if getLink[0] == '/':
+                            getLink = 'http://' + baseLink + getLink
+                            # This is how we make sure that duplicates are not made
+                            if getLink not in listOfLinks and getLink not in fiveOrLessSeedsGenerated and "#bottom-story-socials" not in getLink:
+                                ##print(getLink in listOfLinks)
+                                # print(list(open(txtName + '.txt', 'r')))
+                                ##print(listOfLinks[0])
+                                ##print(getLink)
+                                fiveOrLessSeedsGenerated.append(getLink)
+                                # Adds 1 to counter to make sure that we are getting 5 or less seeds from a seed (as
+                                # requested from teachers)
+                                counter += 1
+                            if counter == 5:
+                                break
     ##print(fiveOrLessSeedsGenerated)
     return fiveOrLessSeedsGenerated
 
@@ -61,7 +67,7 @@ def get5Seeds(url, listOfLinks):
 # Url is a url, txtName is the text file name
 def add5SeedsToList(url, txtName):
     # To my knowlege, this is what gets the url page
-    page = requests.get(url.strip())
+    page = requests.get(url.strip(), allow_redirects=False)
     # To my knowlege, this is what process the url page into html
     soup = BeautifulSoup(page.content, 'html.parser')
 
@@ -89,7 +95,7 @@ def add5SeedsToList(url, txtName):
                     if getLink[0] == '/':
                         getLink = 'http://' + baseLink + getLink
                         # This is how we make sure that duplicates are not made
-                        if getLink + '\n' not in list(open(txtName + '.txt', 'r')):
+                        if getLink + '\n' not in list(open(txtName + '.txt', 'r', encoding="utf-8")):
                             # print(list(open(txtName + '.txt', 'r')))
                             print(getLink)
                             txt.write('http://' + urlparse(url).netloc + link.get('href'))
@@ -125,7 +131,7 @@ def thousandSeedGenerator():
     for URL in open(txtName + '.txt', 'r'):
         # print('url: '+ URL)
         # If every line in file is less than 1000. This is how we get exactly 1000 or less urls.
-        if len(list(open(txtName + '.txt', 'r'))) >= 1000:
+        if len(list(open(txtName + '.txt', 'r', encoding="utf-8"))) >= 1000:
             break
         add5SeedsToList(URL, txtName)
 
@@ -134,10 +140,14 @@ def thousandSeedGenerator():
 # being checked, fileName1 is the file with all the words that relate to the coronavirus and the vaccines in it
 def coronaTermChecker(link, fileName1):
     # This removes the \n in the lists (as they stay in when turning the file into a list of words for whatever reason)
-    fileName1Words = [j.rstrip() for j in list(open(fileName1 + '.txt', 'r'))]
+    fileName1Words = [j.rstrip() for j in list(open(fileName1 + '.txt', 'r', encoding="utf-8"))]
     for word in fileName1Words:
-        if word.lower() in link.lower():
-            return True
+        try:
+            if word.lower() in link.lower():
+                return True
+        except:
+            if word in link:
+                return True
     return False
 
 
