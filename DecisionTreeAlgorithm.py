@@ -30,31 +30,34 @@ emb_dim = 156
 #Number of datas / by
 batch_size = 2
 
-data = pd.read_csv('TwitterData.csv')
-#data = pd.read_csv('uci-news-aggregator.csv')
+csvName = input('What is the name of the csv file you are opening?')
+data = pd.read_csv(csvName +'.csv')
 
-#data.tweet_text.value_counts()
 
+inputs = int(input('How many inputs will you be putting in (please type in number)?'))
 
 n_most_common_words = 8000
 max_len = 130
-tokenizer = Tokenizer(num_words=n_most_common_words, filters='!"#$%&()*+,-./:;<=>?@[\]^_`{|}~', lower=True)
-#tokenizer.fit_on_texts(data['TITLE'].values)
-tokenizer.fit_on_texts(data['tweet_text'].values)
-#sequences = tokenizer.texts_to_sequences(data['TITLE'].values)
-sequences = tokenizer.texts_to_sequences(data['tweet_text'].values)
-word_index = tokenizer.word_index
-print('Found %s unique tokens.' % len(word_index))
 
-X = pad_sequences(sequences, maxlen=max_len)
-print(X)
+listOfSequences = []
+for i in range(inputs):
 
-#Y = pd.get_dummies(data['CATEGORY']).values
-Y = pd.get_dummies(data['classification']).values
-print(Y)
+    columnName = input('What is the name of the column of input ' + str(i+1) + ' (X axis):')
+
+    tokenizer = Tokenizer(num_words=n_most_common_words, filters='!"#$%&()*+,-./:;<=>?@[\]^_`{|}~', lower=True)
+
+    tokenizer.fit_on_texts(data[columnName].values)
+
+    sequences = tokenizer.texts_to_sequences(data[columnName].values)
+    listOfSequences.append((pad_sequences(sequences, maxlen=max_len)))
+
+X = np.concatenate(listOfSequences,axis=1)
+#print(X)
+
+columnName = input('What is the name of the column of the output (Y axis)?')
+Y = pd.get_dummies(data[columnName]).values
 
 X_train, X_test, y_train, y_test = train_test_split(X , Y, test_size=0.3, random_state=42)
-print((X_train.shape, y_train.shape, X_test.shape, y_test.shape))
 
 decision_tree = DecisionTreeClassifier(criterion = "gini", random_state = 100, max_depth=4, min_samples_leaf=11)
 decision_tree = decision_tree.fit(X_train, y_train)
