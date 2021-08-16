@@ -24,11 +24,6 @@ from io import StringIO
 
 import os
 
-#Test Runs
-epochs = 1000
-emb_dim = 156
-#Number of datas / by
-batch_size = 2
 
 csvName = input('What is the name of the csv file you are opening?')
 data = pd.read_csv(csvName +'.csv')
@@ -39,6 +34,10 @@ inputs = int(input('How many inputs will you be putting in (please type in numbe
 n_most_common_words = 8000
 max_len = 130
 
+listOfSequences = []
+
+
+# For every column that will be in the X axis, we clean the data and split the sentences into words, but excludes the stop words
 listOfSequences = []
 for i in range(inputs):
 
@@ -51,9 +50,25 @@ for i in range(inputs):
     sequences = tokenizer.texts_to_sequences(data[columnName].values)
     listOfSequences.append((pad_sequences(sequences, maxlen=max_len)))
 
-X = np.concatenate(listOfSequences,axis=1)
-#print(X)
 
+
+# Turns all the columns in the listOfSequences into 1 column
+
+yesno = input('Will you be adding context_information to the X-axis (y/n)?')
+
+if yesno == 'Y' or 'y':
+    tweetTFIDFs = []
+    for row in data['context_information']:
+        tweetTFIDF = np.array([])
+        for value in row.split(','):
+            tweetTFIDF = np.append(tweetTFIDF, float(value))
+        tweetTFIDFs.append(tweetTFIDF)
+    listOfSequences.append(np.stack(pad_sequences(tweetTFIDFs, dtype='float32'), axis=0))
+
+X = np.concatenate(listOfSequences,axis=1)
+
+
+# Turns 1 column into the Y axis
 columnName = input('What is the name of the column of the output (Y axis)?')
 Y = pd.get_dummies(data[columnName]).values
 
