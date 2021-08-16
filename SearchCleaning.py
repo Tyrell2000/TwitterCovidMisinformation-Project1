@@ -566,10 +566,8 @@ try:
             seedSet.write(seedSetUrls[currentSeedNum])
             seedSet.write("\n")
         currentSeedNum += 1
-
         # close the file associated with this seed. we are done adding text to it
         currentSeed.close()
-
 except Exception as e:
     seedSet = open("pages/" + seedFileName, "w", encoding="utf-8")
     for seedUrl in seedSetUrls:
@@ -583,8 +581,6 @@ except Exception as e:
         currentSeed.close()
     except:
         p = 0
-
     print("Error! Stopping seed text gathering.")
-
 seedSet.close()
 '''

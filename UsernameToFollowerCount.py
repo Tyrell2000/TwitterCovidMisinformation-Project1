@@ -6,7 +6,8 @@ auth.set_access_token('2856969806-KuiNT2Gu8xT3vdJDhiM79ut7MPh8ximDbZYBmBy', 'Lm5
 
 api = tweepy.API(auth)
 
-ids=['fema']
+#Put usernames of accounts in here to  get ids from
+ids=[]
 
 followerCount=[]
 
@@ -15,6 +16,7 @@ for id in ids:
     # fetching the user
     user = api.get_user(id)
 
+    #Adding user follower count to list
     followerCount.append(user.followers_count)
 
 print(followerCount)

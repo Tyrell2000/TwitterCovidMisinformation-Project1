@@ -1,7 +1,7 @@
 # in pycharm, go to file, settings, project, project interpreter,
 # click on the + and type in tweepy to install the tweepy library
 import tweepy
-
+import os
 
 def tweetGetter(public_tweets, csv):
     # To summarize this section, I more or less just got every item in Status object
@@ -188,43 +188,38 @@ name = input("Enter the name of the CVS file you are writting data to (file does
 # as it cant process tweets with emojis, ', and other stuff in it.
 # The first slot in this is to make a file, the next slot is
 # either 'w' (write), 'a' (append), or 'x' (create). https://www.w3schools.com/python/python_file_write.as
-csv = open(str(name) + '.csv', 'w', encoding="utf-8")
+csv = open(str(name) + '.csv', 'a', encoding="utf-8")
 
-print("NOTE: current version excludes retweets and replies. To remove this feature, get rid of the ' -filter:retweets -filter:replies' in line 43 along with any other filtering by retweets and replies: ")
-answer = input("What is the search term(s), hashtag(s), or query you would like to look up?: ")
-query = str(answer)
-
-print("A list of all languages and their abbreviations (you must must use abbreviations, like 'en' for english):")
-print("https://developer.twitter.com/en/docs/twitter-for-websites/supported-languages")
-answer = input("What language would you like the tweets in?: ")
-lang = str(answer)
-
-answer = input("How many tweets would you like? (MAX:200): ")
-num = 50
-
-# To my knowledge, we do user_timeline to get specific users. User_timeline
-# does BOTH tweets and retweets on the specific twitter handle.
-# The @____ is a twitter handle, count is number of tweets you want. There are more options.
-# Here is the documentation for this: https://docs.tweepy.org/en/stable/api.html#timeline-methods
-# Max number of tweets we can return is 200, unless we do a special method
-# in which case, it is 3200.
-public_tweets = tweepy.Cursor(api.search, q= query +' -filter:retweets -filter:replies',
-                              tweet_mode='extended', lang=lang).items(num)
-
-
-answer = input("Would you like a row of text that describes what is in each column? (Y/N): ")
-YN = str(answer)
-
-if YN == ('y' or 'Y'):
-    # Here is a list of all the data we are collecting/how the data is being stored in the CSV
-    csv.write('tweet_created_at, tweet_id_str, tweet_text, link_to_tweet, hashtags, urls_in_text, source, user_id_str,'
+csv.write('tweet_created_at, tweet_id_str, tweet_text, link_to_tweet, hashtags, urls_in_text, source, user_id_str,'
           'user_name, user_screen_name, location, profile_location, user_profile_description, url, protected,'
           'followers_count, friends_count, listed_count, profile_created_at, favorites_count, utc_offset, geo_enabled,'
           'verified, statuses_count, lang, status, contributors_enabled, is_translation_enabled, tweet_geo,'
           'tweet_coordinates, tweet_place, tweet_contributors, tweet_is_quote_status, tweet_retweet_count,'
           'tweet_favorite_count')
-    csv.write('\n \n')
 
-tweetGetter(public_tweets, csv)
+languages = ['en', 'es', 'ru', 'zh-cn', 'tr']
+for lang in languages:
+    print("\n"*2)
+    os.system('cls' if os.name == 'nt' else 'clear')
+    print("This is for the tweets that are in " + lang + ":")
+    print(" ")
+    print("NOTE: current version excludes retweets and replies. To remove this feature, get rid of the ' -filter:retweets -filter:replies' in line 43 along with any other filtering by retweets and replies: ")
+    answer = input("What is the search term(s), hashtag(s), or query you would like to look up?: ")
+    query = str(answer)
+
+
+    #answer = input("How many tweets would you like? (MAX:200): ")
+    num = 50
+
+    # To my knowledge, we do user_timeline to get specific users. User_timeline
+    # does BOTH tweets and retweets on the specific twitter handle.
+    # The @____ is a twitter handle, count is number of tweets you want. There are more options.
+    # Here is the documentation for this: https://docs.tweepy.org/en/stable/api.html#timeline-methods
+    # Max number of tweets we can return is 200, unless we do a special method
+    # in which case, it is 3200.
+    public_tweets = tweepy.Cursor(api.search, q= query +' -filter:retweets -filter:replies',
+                                  tweet_mode='extended', lang=lang).items(num)
+
+    tweetGetter(public_tweets, csv)
 
 csv.close()

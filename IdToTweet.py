@@ -13,231 +13,161 @@ auth.set_access_token('2856969806-KuiNT2Gu8xT3vdJDhiM79ut7MPh8ximDbZYBmBy', 'Lm5
 api = tweepy.API(auth)
 
 
-name = input("Enter the name of the CVS file you are writting data to (file does not have to exist): ")
-
 # Make sure that when u open the csv file, it has encoding="utf-8"
 # as it cant process tweets with emojis, ', and other stuff in it.
 # The first slot in this is to make a file, the next slot is
 # either 'w' (write), 'a' (append), or 'x' (create). https://www.w3schools.com/python/python_file_write.as
-csv = open(str(name) + '.csv', 'w', encoding="utf-8")
+csv = open('a.csv', 'a', encoding="utf-8")
 
-answer = input("Please put in the tweet ID which you would like to look up?: ")
-tweetID = str(answer)
+answer = input("Please put in the text file name of the tweet IDs: ")
+tweetIDs = open(answer + ".txt", "r")
 
+for tweetID in tweetIDs:
+    tweet = api.get_status(tweetID, tweet_mode='extended')
+    csv.write('"' + str(tweet.created_at).replace("\n", " ").replace('"', "'") + '",')
+    csv.write('"' + str(tweet.id_str).replace("\n", " ").replace('"', "'") + '",')
+    textFromTweet = tweet.full_text.replace("\n", " ").replace('"', "'")
 
+    if len(tweet.entities.get("urls")) > 0:
+        for url in tweet.entities.get("urls"):
+            textFromTweet = textFromTweet.replace(str(url.get("url")), "")
 
+    csv.write('"' + textFromTweet + '",')
 
-# Get the numbers from the tweet hyperlink and place them behind the comma
-# For example my link is:
-# https://twitter.com/Jane01010/status/1408413309112553476
-# So my numbers are 1408413309112553476
-# So public_tweets looks like:
-# api.get_status(1339660498636333056, tweet_mode='extended')
-public_tweets = api.get_status(tweetID, tweet_mode='extended')
-#This will extract data and put it in the way we formatted it.
-#The data will be placed in a file and it will be a CSV file, TwitterData.csv (text is printed for the retweets and likes in this)
-#Also after doing 1 tweet, you can comment out line 50, as that is just to tell you what the columns represent
+    csv.write('"' + "https:\\twitter.com\\" + str(tweet.user.screen_name).replace("\n", " ").replace('"', "'") +
+              "\\status\\" + str(tweet.id_str).replace("\n", " ").replace('"', "'") + '",')
 
-
-
-
-
-
-
-answer = input("Would you like a row of text that describes what is in each column? (Y/N): ")
-YN = str(answer)
-
-if YN == ('y' or 'Y'):
-    # Here is a list of all the data we are collecting/how the data is being stored in the CSV
-    csv.write('tweet_created_at, tweet_id_str, tweet_text, link_to_tweet, hashtags, urls_in_text, source, user_id_str,'
-          'user_name, user_screen_name, location, profile_location, user_profile_description, url, protected,'
-          'followers_count, friends_count, listed_count, profile_created_at, favorites_count, utc_offset, geo_enabled,'
-          'verified, statuses_count, lang, status, contributors_enabled, is_translation_enabled, tweet_geo,'
-          'tweet_coordinates, tweet_place, tweet_contributors, tweet_is_quote_status, tweet_retweet_count,'
-          'tweet_favorite_count')
-    csv.write('\n \n')
+    if len(tweet.entities['hashtags']) > 0:
+        hashtags = ""
+        for i in range(len(tweet.entities['hashtags'])):
+            if i != len(tweet.entities['hashtags']) - 1:
+                hashtags = hashtags + \
+                           str(tweet.entities['hashtags'][i]['text']).replace("\n", " ").replace('"',
+                                                                                                 "'") + ', '
+            else:
+                hashtags = hashtags + \
+                           str(tweet.entities['hashtags'][i]['text']).replace("\n", " ").replace('"', "'")
+        csv.write('"' + hashtags + '",')
+    else:
+        csv.write('"' + "N/A" + '",')
 
 
-# To summarize this section, I more or less just got every item in Status object
-# (the tweet) and am writing it to the CSV. https://www.geeksforgeeks.org/python-status-object-in-tweepy/
-if public_tweets:
-    ##Not collecting retweets currently
-        ##print(tweet.full_text.replace("\n", " ").replace('"', "'"))
-        ##print(tweet.entities)
-        csv.write('"' + str(public_tweets.created_at).replace("\n", " ").replace('"', "'") + '",')
-        ##csv.write('"' + str(tweet.id).replace("\n", " ").replace('"', "'") + '",')
-        csv.write('"' + str(public_tweets.id_str).replace("\n", " ").replace('"', "'") + '",')
+    csv.write('"' + str(tweet.source).replace("\n", " ").replace('"', "'") + '",')
 
-        # Need to replace \n (newlines) in text as it will cause a new line in the CSV file
-        # Need to convert " into ' in the text, as in order to keep commas in the text, we
-        # have to put the sentence in "". Thus, if there are any sentences with a single "
-        # (I ran into one during this), it will mess up the formatting
-        textFromTweet=public_tweets.full_text.replace("\n", " ").replace('"', "'")
+    if hasattr(tweet.user, 'id_str'):
+        csv.write('"' + str(tweet.user.id_str).replace("\n", " ").replace('"', "'") + '",')
+    else:
+        csv.write('"' + "NONE" + '",')
 
-        if len(public_tweets.entities.get("urls")) > 0:
-            for url in public_tweets.entities.get("urls"):
-                textFromTweet=textFromTweet.replace(str(url.get("url")), "")
+    if hasattr(tweet.user, 'name'):
+        csv.write('"' + str(tweet.user.name).replace("\n", " ").replace('"', "'") + '",')
+    else:
+        csv.write('"' + "NONE" + '",')
 
-        csv.write('"' + textFromTweet + '",')
+    if hasattr(tweet.user, 'screen_name'):
+        csv.write('"' + str(tweet.user.screen_name).replace("\n", " ").replace('"', "'") + '",')
+    else:
+        csv.write('"' + "NONE" + '",')
 
+    if hasattr(tweet.user, 'location'):
+        csv.write('"' + str(tweet.user.location).replace("\n", " ").replace('"', "'") + '",')
+    else:
+        csv.write('"' + "NONE" + '",')
 
-        csv.write('"' + "https:\\twitter.com\\" + str(public_tweets.user.screen_name).replace("\n", " ").replace('"', "'") +
-                  "\\status\\" + str(public_tweets.id_str).replace("\n", " ").replace('"', "'") + '",')
+    if hasattr(tweet.user, 'profile_location'):
+        csv.write('"' + str(tweet.user.profile_location).replace("\n", " ").replace('"', "'") + '",')
+    else:
+        csv.write('"' + "NONE" + '",')
 
-        # Entities is an object with variation in the number of elements
-        # after doing a few hours of work on this, it has been decided
-        # that the best way to go about having this in the data is
-        # to keep the data unedited (its gonna be a dict with an array in it, ect)
-        ##csv.write('"' + str(tweet.entities).replace("\n", " ").replace('"', "'") + '",')
-        ##print('"' + str(tweet.entities).replace("\n", " ").replace('"', "'") + '",')
+    if hasattr(tweet.user, 'description'):
+        csv.write('"' + str(tweet.user.description).replace("\n", " ").replace('"', "'") + '",')
+    else:
+        csv.write('"' + "NONE" + '",')
 
-        if len(public_tweets.entities['hashtags']) > 0:
-            hashtags = ""
-            for i in range(len(public_tweets.entities['hashtags'])):
-                if i != len(public_tweets.entities['hashtags']) - 1:
-                    hashtags = hashtags +\
-                               str(public_tweets.entities['hashtags'][i]['text']).replace("\n", " ").replace('"', "'") + ', '
-                else:
-                    hashtags = hashtags + \
-                               str(public_tweets.entities['hashtags'][i]['text']).replace("\n", " ").replace('"', "'")
-            csv.write('"' + hashtags + '",')
-        else:
-            csv.write('"' + "N/A" + '",')
+    if hasattr(tweet.user, 'url'):
+        csv.write('"' + str(tweet.user.url).replace("\n", " ").replace('"', "'") + '",')
+    else:
+        csv.write('"' + "NONE" + '",')
 
-        ##print(tweet.entities)
-        if len(public_tweets.entities['urls']) > 0:
-            urls = ""
-            for i in range(len(public_tweets.entities['urls'])):
-                if i != len(public_tweets.entities['urls']) - 1:
-                    urls = urls +\
-                               str(public_tweets.entities['urls'][i]['url']).replace("\n", " ").replace('"', "'") + ', '
-                else:
-                    urls = urls + \
-                               str(public_tweets.entities['urls'][i]['url']).replace("\n", " ").replace('"', "'")
-            csv.write('"' + urls + '",')
-        else:
-            csv.write('"' + "N/A" + '",')
-        ##csv.write('"' + str(tweet.entities['hashtag'][0]).replace("\n", " ").replace('"', "'") + '",')
+    if hasattr(tweet.user, 'protected'):
+        csv.write('"' + str(tweet.user.protected).replace("\n", " ").replace('"', "'") + '",')
+    else:
+        csv.write('"' + "NONE" + '",')
 
-        csv.write('"' + str(public_tweets.source).replace("\n", " ").replace('"', "'") + '",')
+    if hasattr(tweet.user, 'followers_count'):
+        csv.write('"' + str(tweet.user.followers_count).replace("\n", " ").replace('"', "'") + '",')
+    else:
+        csv.write('"' + "NONE" + '",')
 
-        if hasattr(public_tweets.user, 'id_str'):
-            csv.write('"' + str(public_tweets.user.id_str).replace("\n", " ").replace('"', "'") + '",')
-        else:
-            csv.write('"' + "NONE" + '",')
+    if hasattr(tweet.user, 'friends_count'):
+        csv.write('"' + str(tweet.user.friends_count).replace("\n", " ").replace('"', "'") + '",')
+    else:
+        csv.write('"' + "NONE" + '",')
 
-        if hasattr(public_tweets.user, 'name'):
-            csv.write('"' + str(public_tweets.user.name).replace("\n", " ").replace('"', "'") + '",')
-        else:
-            csv.write('"' + "NONE" + '",')
+    if hasattr(tweet.user, 'listed_count'):
+        csv.write('"' + str(tweet.user.listed_count).replace("\n", " ").replace('"', "'") + '",')
+    else:
+        csv.write('"' + "NONE" + '",')
 
-        if hasattr(public_tweets.user, 'screen_name'):
-            csv.write('"' + str(public_tweets.user.screen_name).replace("\n", " ").replace('"', "'") + '",')
-        else:
-            csv.write('"' + "NONE" + '",')
+    if hasattr(tweet.user, 'created_at'):
+        csv.write('"' + str(tweet.user.created_at).replace("\n", " ").replace('"', "'") + '",')
+    else:
+        csv.write('"' + "NONE" + '",')
 
-        if hasattr(public_tweets.user, 'location'):
-            csv.write('"' + str(public_tweets.user.location).replace("\n", " ").replace('"', "'") + '",')
-        else:
-            csv.write('"' + "NONE" + '",')
+    if hasattr(tweet.user, 'favourites_count'):
+        csv.write('"' + str(tweet.user.favourites_count).replace("\n", " ").replace('"', "'") + '",')
+    else:
+        csv.write('"' + "NONE" + '",')
 
-        if hasattr(public_tweets.user, 'profile_location'):
-            csv.write('"' + str(public_tweets.user.profile_location).replace("\n", " ").replace('"', "'") + '",')
-        else:
-            csv.write('"' + "NONE" + '",')
+    if hasattr(tweet.user, 'utc_offset'):
+        csv.write('"' + str(tweet.user.utc_offset).replace("\n", " ").replace('"', "'") + '",')
+    else:
+        csv.write('"' + "NONE" + '",')
 
-        if hasattr(public_tweets.user, 'description'):
-            csv.write('"' + str(public_tweets.user.description).replace("\n", " ").replace('"', "'") + '",')
-        else:
-            csv.write('"' + "NONE" + '",')
+    if hasattr(tweet.user, 'geo_enabled'):
+        csv.write('"' + str(tweet.user.geo_enabled).replace("\n", " ").replace('"', "'") + '",')
+    else:
+        csv.write('"' + "NONE" + '",')
 
-        if hasattr(public_tweets.user, 'url'):
-            csv.write('"' + str(public_tweets.user.url).replace("\n", " ").replace('"', "'") + '",')
-        else:
-            csv.write('"' + "NONE" + '",')
+    if hasattr(tweet.user, 'verified'):
+        csv.write('"' + str(tweet.user.verified).replace("\n", " ").replace('"', "'") + '",')
+    else:
+        csv.write('"' + "NONE" + '",')
 
+    if hasattr(tweet.user, 'statuses_count'):
+        csv.write('"' + str(tweet.user.statuses_count).replace("\n", " ").replace('"', "'") + '",')
+    else:
+        csv.write('"' + "NONE" + '",')
 
-        if hasattr(public_tweets.user, 'protected'):
-            csv.write('"' + str(public_tweets.user.protected).replace("\n", " ").replace('"', "'") + '",')
-        else:
-            csv.write('"' + "NONE" + '",')
+    if hasattr(tweet.user, 'lang'):
+        csv.write('"' + str(tweet.user.lang).replace("\n", " ").replace('"', "'") + '",')
+    else:
+        csv.write('"' + "NONE" + '",')
 
-        if hasattr(public_tweets.user, 'followers_count'):
-            csv.write('"' + str(public_tweets.user.followers_count).replace("\n", " ").replace('"', "'") + '",')
-        else:
-            csv.write('"' + "NONE" + '",')
+    if hasattr(tweet.user, 'status'):
+        # Not sure if there needs to be more division, as I havent seen
+        csv.write('"' + str(tweet.user.status).replace("\n", " ").replace('"', "'") + '",')
+    else:
+        csv.write('"' + "NONE" + '",')
 
-        if hasattr(public_tweets.user, 'friends_count'):
-            csv.write('"' + str(public_tweets.user.friends_count).replace("\n", " ").replace('"', "'") + '",')
-        else:
-            csv.write('"' + "NONE" + '",')
+    if hasattr(tweet.user, 'contributors_enabled'):
+        csv.write('"' + str(tweet.user.contributors_enabled).replace("\n", " ").replace('"', "'") + '",')
+    else:
+        csv.write('"' + "NONE" + '",')
 
-        if hasattr(public_tweets.user, 'listed_count'):
-            csv.write('"' + str(public_tweets.user.listed_count).replace("\n", " ").replace('"', "'") + '",')
-        else:
-            csv.write('"' + "NONE" + '",')
+    if hasattr(tweet.user, 'is_translation_enabled'):
+        csv.write('"' + str(tweet.user.is_translation_enabled).replace("\n", " ").replace('"', "'") + '",')
+    else:
+        csv.write('"' + "NONE" + '",')
 
-        if hasattr(public_tweets.user, 'created_at'):
-            csv.write('"' + str(public_tweets.user.created_at).replace("\n", " ").replace('"', "'") + '",')
-        else:
-            csv.write('"' + "NONE" + '",')
-
-        if hasattr(public_tweets.user, 'favourites_count'):
-            csv.write('"' + str(public_tweets.user.favourites_count).replace("\n", " ").replace('"', "'") + '",')
-        else:
-            csv.write('"' + "NONE" + '",')
-
-        if hasattr(public_tweets.user, 'utc_offset'):
-            csv.write('"' + str(public_tweets.user.utc_offset).replace("\n", " ").replace('"', "'") + '",')
-        else:
-            csv.write('"' + "NONE" + '",')
-
-        if hasattr(public_tweets.user, 'geo_enabled'):
-            csv.write('"' + str(public_tweets.user.geo_enabled).replace("\n", " ").replace('"', "'") + '",')
-        else:
-            csv.write('"' + "NONE" + '",')
-
-        if hasattr(public_tweets.user, 'verified'):
-            csv.write('"' + str(public_tweets.user.verified).replace("\n", " ").replace('"', "'") + '",')
-        else:
-            csv.write('"' + "NONE" + '",')
-
-        if hasattr(public_tweets.user, 'statuses_count'):
-            csv.write('"' + str(public_tweets.user.statuses_count).replace("\n", " ").replace('"', "'") + '",')
-        else:
-            csv.write('"' + "NONE" + '",')
-
-        if hasattr(public_tweets.user, 'lang'):
-            csv.write('"' + str(public_tweets.user.lang).replace("\n", " ").replace('"', "'") + '",')
-        else:
-            csv.write('"' + "NONE" + '",')
-
-        if hasattr(public_tweets.user, 'status'):
-            # Not sure if there needs to be more division, as I havent seen
-            csv.write('"' + str(public_tweets.user.status).replace("\n", " ").replace('"', "'") + '",')
-        else:
-            csv.write('"' + "NONE" + '",')
-
-        if hasattr(public_tweets.user, 'contributors_enabled'):
-            csv.write('"' + str(public_tweets.user.contributors_enabled).replace("\n", " ").replace('"', "'") + '",')
-        else:
-            csv.write('"' + "NONE" + '",')
-
-
-        if hasattr(public_tweets.user, 'is_translation_enabled'):
-            csv.write('"' + str(public_tweets.user.is_translation_enabled).replace("\n", " ").replace('"', "'") + '",')
-        else:
-            csv.write('"' + "NONE" + '",')
-
-        csv.write('"' + str(public_tweets.geo).replace("\n", " ").replace('"', "'") + '",')
-        csv.write('"' + str(public_tweets.coordinates).replace("\n", " ").replace('"', "'") + '",')
-        csv.write('"' + str(public_tweets.place).replace("\n", " ").replace('"', "'") + '",')
-        csv.write('"' + str(public_tweets.contributors).replace("\n", " ").replace('"', "'") + '",')
-        csv.write('"' + str(public_tweets.is_quote_status).replace("\n", " ").replace('"', "'") + '",')
-        csv.write('"' + str(public_tweets.retweet_count).replace("\n", " ").replace('"', "'") + '",')
-        csv.write('"' + str(public_tweets.favorite_count).replace("\n", " ").replace('"', "'") + '"')
-
-        csv.write("\n")
+    csv.write('"' + str(tweet.geo).replace("\n", " ").replace('"', "'") + '",')
+    csv.write('"' + str(tweet.coordinates).replace("\n", " ").replace('"', "'") + '",')
+    csv.write('"' + str(tweet.place).replace("\n", " ").replace('"', "'") + '",')
+    csv.write('"' + str(tweet.contributors).replace("\n", " ").replace('"', "'") + '",')
+    csv.write('"' + str(tweet.is_quote_status).replace("\n", " ").replace('"', "'") + '",')
+    csv.write('"' + str(tweet.retweet_count).replace("\n", " ").replace('"', "'") + '",')
+    csv.write('"' + str(tweet.favorite_count).replace("\n", " ").replace('"', "'") + '"')
+    csv.write("\n")
 
 
 csv.close()
