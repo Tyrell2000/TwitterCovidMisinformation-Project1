@@ -7,6 +7,10 @@ import Search
 import random
 
 
+documentWords = open("pages/documentWords.txt", "w", encoding="utf-8")
+documentWords.truncate()
+documentWords.close()
+
 def tag_visible(element):
     if element.parent.name in ['style', 'script', 'head', 'title', 'meta', '[document]']:
         return False
@@ -155,11 +159,13 @@ languageDocumentsSaved = {"English": 0, "Spanish": 0, "Turkish": 0, "Russian": 0
 
 # Filter and write text of webpage from given url
 def writeWebpageTextMultipleLanguages(url, languageCheckList):
+    random.shuffle(languageCheckList)
     languageGathered = ""
     global seedsSkipped
     writeThisSeed = False
     isCorrectLanguage = False
     languageWordsFound = []
+    wordsGathered = {"English": 0, "Spanish": 0, "Russian": 0, "Turkish": 0, "Chinese": 0}
 
     urlCheck = open("urlCheck.txt", "a", encoding="utf-8")
     urlCheck.write(url)
@@ -204,28 +210,33 @@ def writeWebpageTextMultipleLanguages(url, languageCheckList):
                     for line in text:
                         if checkWord in line.split(" "):
                             if checkWord not in languageWordsFound:
-                                languageWordsFound.append(checkWord)
-                                if len(languageWordsFound) == 5:
-                                    if checkWord in englishLanguage:
-                                        if languageDocumentsSaved["English"] < (lastSeed / 5):
-                                            languageGathered = "English"
-                                            isCorrectLanguage = True
-                                    elif checkWord in spanishLanguage:
-                                        if languageDocumentsSaved["Spanish"] < (lastSeed / 5):
-                                            languageGathered = "Spanish"
-                                            isCorrectLanguage = True
-                                    elif checkWord in turkishLanguage:
-                                        if languageDocumentsSaved["Turkish"] < (lastSeed / 5):
-                                            languageGathered = "Turkish"
-                                            isCorrectLanguage = True
-                                    elif checkWord in chineseLanguage:
-                                        if languageDocumentsSaved["Chinese"] < (lastSeed / 5):
-                                            languageGathered = "Chinese"
-                                            isCorrectLanguage = True
-                                    elif checkWord in russianLanguage:
-                                        if languageDocumentsSaved["Russian"] < (lastSeed / 5):
-                                            languageGathered = "Russian"
-                                            isCorrectLanguage = True
+                                if checkWord in englishLanguage:
+                                    wordsGathered["English"] = wordsGathered["English"] + 1
+                                    languageWordsFound.append(checkWord)
+                                elif checkWord in spanishLanguage:
+                                    wordsGathered["Spanish"] = wordsGathered["Spanish"] + 1
+                                    languageWordsFound.append(checkWord)
+                                elif checkWord in turkishLanguage:
+                                    wordsGathered["Turkish"] = wordsGathered["Turkish"] + 1
+                                    languageWordsFound.append(checkWord)
+                                elif checkWord in chineseLanguage:
+                                    wordsGathered["Chinese"] = wordsGathered["Chinese"] + 1
+                                    languageWordsFound.append(checkWord)
+                                elif checkWord in russianLanguage:
+                                    wordsGathered["Russian"] = wordsGathered["Russian"] + 1
+                                    languageWordsFound.append(checkWord)
+
+    highestWordCount = 0
+    correctLang = ""
+    for lang in wordsGathered:
+        if wordsGathered[lang] > highestWordCount and wordsGathered[lang] >= 5:
+            correctLang = lang
+            highestWordCount = wordsGathered[lang]
+
+    if correctLang != "":
+        if languageDocumentsSaved[correctLang] < (lastSeed / 5):
+            languageGathered = correctLang
+            isCorrectLanguage = True
 
     if writeThisSeed and isCorrectLanguage:
         textSaved.append(here)
@@ -270,12 +281,12 @@ def writeWebpageTextMultipleLanguages(url, languageCheckList):
 
         # Uncomment the code below to get a txt file containing the language words used to identify a document of txt
         # to save as being the correct language.
-        '''documentWords = open("pages/documentWords.txt", "w", encoding="utf-8")
-        for docNum in documentLanguageWordsFound:
-            toWrite = "Document " + docNum + ": " + str(", ".join(documentLanguageWordsFound[docNum]))
-            documentWords.write(toWrite)
-            documentWords.write("\n")
-        documentWords.close()'''
+        documentWords = open("pages/documentWords.txt", "a", encoding="utf-8")
+        toWrite = "Document " + str(len(seedSetUrls)) + "(" + languageGathered + "): " + \
+                  str(", ".join(documentLanguageWordsFound[str(len(seedSetUrls))]))
+        documentWords.write(toWrite)
+        documentWords.write("\n")
+        documentWords.close()
 
     else:
         seedsSkipped += 1
