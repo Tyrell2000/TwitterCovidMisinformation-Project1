@@ -164,6 +164,7 @@ def writeWebpageTextMultipleLanguages(url, languageCheckList):
     global seedsSkipped
     writeThisSeed = False
     isCorrectLanguage = False
+    isChinese = False
     languageWordsFound = []
     wordsGathered = {"English": 0, "Spanish": 0, "Russian": 0, "Turkish": 0, "Chinese": 0}
 
@@ -174,6 +175,39 @@ def writeWebpageTextMultipleLanguages(url, languageCheckList):
 
     # open web page
     page = requests.get(url.strip())
+    checkChinese = requests.get(url.strip())
+    checkChinese.encoding = "GBK"
+    checkChineseSoup = bs4.BeautifulSoup(checkChinese.text, "html.parser")
+    texts = checkChineseSoup.findAll('p')
+    visible_texts = filter(tag_visible, texts)
+
+    for lineOfText in visible_texts:
+        if lineOfText != "\n" and lineOfText != " ":
+            # if you want the tags (<p>, <div>, ect still in, remove .get_text)
+
+            text = []
+            for x in lineOfText:
+                if isinstance(x, bs4.element.NavigableString):
+                    text.append(x.strip())
+
+            for chineseWord in chineseLanguage:
+                if chineseWord in " ".join(text):
+                    isChinese = True
+                    print("Has Chinese!")
+                    print(" ".join(text))
+
+    if not isChinese:
+        page = requests.get(url.strip())
+
+        # set soup equal to the webpage html contents
+        soup = BeautifulSoup(page.content, 'html.parser')
+
+        # get all text from the webpage
+        texts = soup.findAll('p')
+
+        # filter out invisible text in the html
+        visible_texts = filter(tag_visible, texts)
+
     ##print(currentSeedNumber)
     ##print(urls[currentSeedNumber])
 
