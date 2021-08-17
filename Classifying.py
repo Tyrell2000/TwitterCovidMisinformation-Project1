@@ -21,23 +21,24 @@ from matplotlib.pyplot import figure
 
 # Followed this tutorial: https://towardsdatascience.com/multi-class-text-classification-with-scikit-learn-12f1e60e0a9f
 
-twitterData = "C:\\Users\\tyrel\\OneDrive\\Desktop\\TwitterCovidMisinformation-Project1\\TwitterDataset.csv"
+twitterData = "C:\\Users\\tyrel\\OneDrive\\Desktop\\TwitterCovidMisinformation-Project1\\TwitterData.csv"
 
-here = ['tweet_created_at', 'id_str', 'labelled', 'tweet_text', 'hashtags', 'source', 'user_id_str', 'user_name',
+here = ['tweet_created_at', 'id_str', 'tweet_text', 'tweet_link', 'hashtags', 'source', 'user_id_str', 'user_name',
         'user_screen_name', 'location', 'profile_location', 'user_profile_description', 'url', 'protected',
         'followers_count', 'friends_count', 'listed_count', 'profile_created_at', 'favorites_count', 'utc_offset',
         'geo_enabled', 'verified', 'statuses_count', 'lang', 'status', 'contributors_enabled', 'is_translation_enabled',
         'tweet_geo', 'tweet_coordinates', 'tweet_place', 'tweet_contributors', 'tweet_is_quote_status',
-        'tweet_retweet_count', 'tweet_favorite_count']
+        'tweet_retweet_count', 'tweet_favorite_count', 'classification', 'context_information']
 
-data = pd.read_csv(twitterData, names=['tweet_created_at', 'id_str', 'labelled', 'tweet_text', 'hashtags', 'source',
+data = pd.read_csv(twitterData, names=['tweet_created_at', 'id_str', 'tweet_text', 'tweet_link', 'hashtags', 'source',
                                        'user_id_str', 'user_name', 'user_screen_name', 'location', 'profile_location',
                                        'user_profile_description', 'url', 'protected', 'followers_count',
                                        'friends_count', 'listed_count', 'profile_created_at', 'favorites_count',
                                        'utc_offset', 'geo_enabled', 'verified', 'statuses_count', 'lang', 'status',
                                        'contributors_enabled', 'is_translation_enabled', 'tweet_geo',
                                        'tweet_coordinates', 'tweet_place', 'tweet_contributors',
-                                       'tweet_is_quote_status', 'tweet_retweet_count', 'tweet_favorite_count'],
+                                       'tweet_is_quote_status', 'tweet_retweet_count', 'tweet_favorite_count',
+                                       'classification', 'context_information'],
                    encoding='utf-8')
 
 ##print(data.columns)
@@ -45,25 +46,31 @@ data = pd.read_csv(twitterData, names=['tweet_created_at', 'id_str', 'labelled',
 
 ##print(data.head())
 
-col = ["tweet_text", "labelled"]
+col = ["tweet_text", "classification", "context_information"]
 
 df = data[col]
-df.columns = ["text", "label"]
+df.columns = ["text", "label", "context"]
+##df = df.reset_index()
+
+df.dropna(axis=0, inplace=True)
+df.dropna(axis=0, inplace=True)
+df.dropna(axis=0, inplace=True)
 
 ##print(df.head)
 
 tfidf = TfidfVectorizer(sublinear_tf=True, min_df=5, norm='l2', encoding='utf-8', ngram_range=(1, 2),
                         stop_words='english')
 
-features = tfidf.fit_transform(df.text).toarray()
+features = tfidf.fit_transform(df.text, df.context).toarray()
 labels = df.label
+textContext = df.context
 
 df['category_id'] = df['label'].factorize()[0]
 category_id_df = df[['label', 'category_id']].drop_duplicates().sort_values('category_id')
 category_to_id = dict(category_id_df.values)
 id_to_category = dict(category_id_df[['category_id', 'label']].values)
-
-X_train, X_test, y_train, y_test = train_test_split(df['text'], df['label'], train_size=0.3, random_state=0)
+X = np.array(df['text'], df['context'])
+X_train, X_test, y_train, y_test = train_test_split(X, df['label'], train_size=0.3, random_state=0)
 count_vect = CountVectorizer()
 X_train_counts = count_vect.fit_transform(X_train)
 tfidf_transformer = TfidfTransformer()
@@ -84,6 +91,7 @@ for model in models:
     accuracies = cross_val_score(model, features, labels, scoring='accuracy', cv=CV)
     for fold_idx, accuracy in enumerate(accuracies):
         entries.append((model_name, fold_idx, accuracy))
+        print("Model:", model_name + "     ", "Accuracy:", accuracy)
 cv_df = pd.DataFrame(entries, columns=['model_name', 'fold_idx', 'accuracy'])
 
 sns.boxplot(x='model_name', y='accuracy', data=cv_df)
