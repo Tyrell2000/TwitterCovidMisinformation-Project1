@@ -3,10 +3,11 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 import numpy
 import sys
 numpy.set_printoptions(threshold=sys.maxsize)
+from nltk.corpus import stopwords
 
 #This calculates the TFIDF using sklearn TfidfVectorizer
 def computeTFIDF(stuff):
-    tfidf = TfidfVectorizer(use_idf=True, lowercase=True, encoding='utf-8', stop_words='english')
+    tfidf = TfidfVectorizer(use_idf=True, lowercase=True, encoding='utf-8', stop_words=set(stopwords.words('turkish')))
     tfidfOfStuff = tfidf.fit_transform(stuff)
     tfidfScoreArray = tfidfOfStuff.toarray()
     return tfidfScoreArray
@@ -16,7 +17,7 @@ def computeTFIDF(stuff):
 # This gets the feature words of the TFIDF. This is used to get the
 # formatted words from the tfidf.
 def TFIDFwords(stuff):
-    tfidf = TfidfVectorizer(use_idf=True, lowercase=True, encoding='utf-8', stop_words='english')
+    tfidf = TfidfVectorizer(use_idf=True, lowercase=True, encoding='utf-8', stop_words=set(stopwords.words('turkish')))
     tfidfOfStuff = tfidf.fit_transform(stuff)
     feature_names = tfidf.get_feature_names()
     return feature_names

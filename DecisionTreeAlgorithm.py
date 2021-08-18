@@ -72,12 +72,14 @@ X = np.concatenate(listOfSequences,axis=1)
 columnName = input('What is the name of the column of the output (Y axis)?')
 Y = pd.get_dummies(data[columnName]).values
 
-X_train, X_test, y_train, y_test = train_test_split(X , Y, test_size=0.3, random_state=42)
+for i in range(10):
+    X_train, X_test, y_train, y_test = train_test_split(X , Y, test_size=0.3, random_state=42)
 
-decision_tree = DecisionTreeClassifier(criterion = "gini", random_state = 100, max_depth=4, min_samples_leaf=11)
-decision_tree = decision_tree.fit(X_train, y_train)
+    decision_tree = DecisionTreeClassifier(criterion = "gini", random_state = 100, max_depth=4, min_samples_leaf=11)
+    decision_tree = decision_tree.fit(X_train, y_train)
 
-score = decision_tree.score(X_test, y_test)
-print(score)
+    score = decision_tree.score(X_test, y_test)
+    print('Accuracy:' + str(score))
+    open(csvName + 'TreeResults.csv', 'a').write('Accuracy: '+ str(score) + '\n')
 
 
