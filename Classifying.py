@@ -18,10 +18,11 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.svm import LinearSVC
 from sklearn.neural_network import MLPClassifier
 from matplotlib.pyplot import figure
+from nltk.corpus import stopwords
 
 # Followed this tutorial: https://towardsdatascience.com/multi-class-text-classification-with-scikit-learn-12f1e60e0a9f
 
-twitterData = "C:\\Users\\tyrel\\OneDrive\\Desktop\\TwitterCovidMisinformation-Project1\\TwitterData.csv"
+csvName = 'EnglishTweetData'
 
 here = ['tweet_created_at', 'id_str', 'tweet_text', 'tweet_link', 'hashtags', 'source', 'user_id_str', 'user_name',
         'user_screen_name', 'location', 'profile_location', 'user_profile_description', 'url', 'protected',
@@ -29,8 +30,12 @@ here = ['tweet_created_at', 'id_str', 'tweet_text', 'tweet_link', 'hashtags', 's
         'geo_enabled', 'verified', 'statuses_count', 'lang', 'status', 'contributors_enabled', 'is_translation_enabled',
         'tweet_geo', 'tweet_coordinates', 'tweet_place', 'tweet_contributors', 'tweet_is_quote_status',
         'tweet_retweet_count', 'tweet_favorite_count', 'classification', 'context_information']
-
-data = pd.read_csv(twitterData, names=['tweet_created_at', 'id_str', 'tweet_text', 'tweet_link', 'hashtags', 'source',
+'''
+data = pd.read_csv(csvName + '.csv', names=['tweet_created_at','tweet_id_str','tweet_text','translation','link_to_tweet','hashtags','urls_in_text','user_id_str','user_screen_name','verified','tweet_is_quote_status','tweet_retweet_count','tweet_favorite_count','classification','context_information'
+],
+                   encoding='utf-8')
+'''
+data = pd.read_csv(csvName + '.csv', names=['tweet_created_at', 'id_str', 'tweet_text', 'tweet_link', 'hashtags', 'source',
                                        'user_id_str', 'user_name', 'user_screen_name', 'location', 'profile_location',
                                        'user_profile_description', 'url', 'protected', 'followers_count',
                                        'friends_count', 'listed_count', 'profile_created_at', 'favorites_count',
@@ -58,8 +63,9 @@ df.dropna(axis=0, inplace=True)
 
 ##print(df.head)
 
+# Change set(stopwords.words('') with the language that your dataset is.
 tfidf = TfidfVectorizer(sublinear_tf=True, min_df=5, norm='l2', encoding='utf-8', ngram_range=(1, 2),
-                        stop_words='english')
+                        stop_words=set(stopwords.words('english')))
 
 features = tfidf.fit_transform(df.text, df.context).toarray()
 labels = df.label
@@ -92,6 +98,7 @@ for model in models:
     for fold_idx, accuracy in enumerate(accuracies):
         entries.append((model_name, fold_idx, accuracy))
         print("Model:", model_name + "     ", "Accuracy:", accuracy)
+        open(csvName + model_name + 'Results.csv', 'a').write('Accuracy: ' + str(accuracy) + '\n')
 cv_df = pd.DataFrame(entries, columns=['model_name', 'fold_idx', 'accuracy'])
 
 sns.boxplot(x='model_name', y='accuracy', data=cv_df)
@@ -123,7 +130,6 @@ plt.show()
             display(df.loc[indices_test[(y_test == actual) & (y_pred == predicted)]][['label', 'text']])
             print(conf_mat[actual, predicted])
             print('')
-
         if predicted == actual:
             print("'{}' predicted correctly: {} examples.".format(id_to_category[actual], id_to_category[predicted],
                                                                  conf_mat[actual, predicted]))
@@ -137,11 +143,7 @@ X = np.array(data["tweet_text"])
 ##print(data['labelled'])
 y = np.array(data['labelled'])
 ##X = np.delete(X, [0, 1, 2, 3, 5, 7, 10, 11, 12, 13], axis=1)
-
-
 X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
-
-
 scores = []
 scores2 = []
 classification_methods = []
@@ -151,94 +153,66 @@ classification_methods2 = []
 results = KNeighborsClassifier(n_neighbors=3).fit(X_train, y_train)
 score = results.score(X_test, y_test)
 score2 = cross_val_score(KNeighborsClassifier(n_neighbors=3), X_test, y_test, cv=5)
-
 scores.append(np.mean(score))
 scores2.append(np.mean(score2))
 classification_methods.append('KNeighbors')
 classification_methods2.append('KNeighbors2')
-
-
 results = LogisticRegression(max_iter=10000000).fit(X_train, y_train)
 score = results.score(X_test, y_test)
 score2 = cross_val_score(LogisticRegression(max_iter=10000000), X_test, y_test, cv=5)
-
 scores.append(np.mean(score))
 scores2.append(np.mean(score2))
 classification_methods.append('LogisticRegression')
 classification_methods2.append('LogisticRegression2')
-
-
 results = MultinomialNB().fit(X_train, y_train)
 score = results.score(X_test, y_test)
 score2 = cross_val_score(MultinomialNB(), X_test, y_test, cv=5)
-
 scores.append(np.mean(score))
 scores2.append(np.mean(score2))
 classification_methods.append('MultinomialNB')
 classification_methods2.append('MultinomialNB2')
-
-
 results = BernoulliNB().fit(X_train, y_train)
 score = results.score(X_test, y_test)
 score2 = cross_val_score(BernoulliNB(), X_test, y_test, cv=5)
-
 scores.append(np.mean(score))
 scores2.append(np.mean(score2))
 classification_methods.append('BernoulliNB')
 classification_methods2.append('BernoulliNB2')
-
-
 results = DecisionTreeClassifier().fit(X_train, y_train)
 score = results.score(X_test, y_test)
 score2 = cross_val_score(DecisionTreeClassifier(), X_test, y_test, cv=5)
-
 scores.append(np.mean(score))
 scores2.append(np.mean(score2))
 classification_methods.append('DecisionTree')
 classification_methods2.append('DecisionTree2')
-
-
 results = LinearSVC(max_iter=1000).fit(X_train, y_train)
 score = results.score(X_test, y_test)
 score2 = cross_val_score(LinearSVC(max_iter=1000), X_test, y_test, cv=5)
-
 scores.append(np.mean(score))
 scores2.append(np.mean(score2))
 classification_methods.append('LinearSVC')
 classification_methods2.append('LinearSVC2')
-
-
 results = MLPClassifier(max_iter=1000).fit(X_train, y_train)
 score = results.score(X_test, y_test)
 score2 = cross_val_score(MLPClassifier(max_iter=100), X_test, y_test, cv=5)
-
 scores.append(np.mean(score))
 scores2.append(np.mean(score2))
 classification_methods.append('MLP')
 classification_methods2.append('MLP2')
-
-
 count_vect = CountVectorizer()
 X_train_counts = count_vect.fit_transform(X)
 X_train_counts.shape
-
 tf_transformer = TfidfTransformer(use_idf=False).fit(X_train_counts)
 X_train_tf = tf_transformer.transform(X_train_counts)
 X_train_tf.shape
-
 classifier = svm.SVC(kernel='linear', C=1, max_iter=10000).fit(X_train_tf, y_train)
 disp = plot_confusion_matrix(classifier, X_test, y_test, normalize='true')
 scoresy = [disp.confusion_matrix[0][0], disp.confusion_matrix[1][1]]
 score3 = np.average(scoresy)
-
-
 figure(num=None, figsize=(100, 100), dpi=200, facecolor='w', edgecolor='k')
-
 xpos = np.arange(start=1, stop=(len(classification_methods) * 2) + 1, step=2)
 xpo2 = np.arange(start=2, stop=(len(classification_methods2) * 2) + 1, step=2)
-
 plt.xticks(xpos, classification_methods)
-
 for i in range(len(classification_methods)):
     if i == 0:
         plt.bar(classification_methods[i], scores[i], label='Test', align='center', color='green')
@@ -246,9 +220,7 @@ for i in range(len(classification_methods)):
     else:
         plt.bar(classification_methods[i], scores[i], align='center', color='green')
         plt.bar(classification_methods2[i], scores2[i], color='cyan')
-
 plt.bar('ConfusionMatrix', score3, label='Confusion Matrix', color='blue')
-
 plt.legend()
 plt.show()
 '''

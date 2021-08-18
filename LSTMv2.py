@@ -71,18 +71,19 @@ else:
 # Turns 1 column into the Y axis
 columnName = input('What is the name of the column of the output (Y axis)?')
 Y = pd.get_dummies(data[columnName]).values
+for i in range(10):
+    #Turning the X and Y column data into test and training data
+    X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.3, random_state=42)
 
-#Turning the X and Y column data into test and training data
-X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.3, random_state=42)
+    model = Sequential()
+    model.add(Embedding(n_most_common_words, emb_dim, input_length=X.shape[1]))
+    model.add(SpatialDropout1D(0.7))
+    model.add(LSTM(64, dropout=0.7, recurrent_dropout=0.7))
+    model.add(Dense(3, activation='softmax'))
+    model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+    history = model.fit(X_train, y_train, epochs=epochs, batch_size=batch_size, validation_split=0.2, verbose=0,
+                        callbacks=[EarlyStopping(monitor='val_loss', patience=7, min_delta=0.0001)])
 
-model = Sequential()
-model.add(Embedding(n_most_common_words, emb_dim, input_length=X.shape[1]))
-model.add(SpatialDropout1D(0.7))
-model.add(LSTM(64, dropout=0.7, recurrent_dropout=0.7))
-model.add(Dense(3, activation='softmax'))
-model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
-history = model.fit(X_train, y_train, epochs=epochs, batch_size=batch_size, validation_split=0.2, verbose=0,
-                    callbacks=[EarlyStopping(monitor='val_loss', patience=7, min_delta=0.0001)])
-
-accr = model.evaluate(X_test, y_test, verbose=0)
-print('Test set\n  Loss: {:0.3f}\n  Accuracy: {:0.3f}'.format(accr[0],accr[1]))
+    accr = model.evaluate(X_test, y_test, verbose=0)
+    print('Test set  Loss: {:0.3f}  Accuracy: {:0.3f}'.format(accr[0],accr[1]))
+    open(csvName +'LSTMResults.csv', 'a').write('Test set  Loss: {:0.3f}  Accuracy: {:0.3f}'.format(accr[0],accr[1]) +'\n')
